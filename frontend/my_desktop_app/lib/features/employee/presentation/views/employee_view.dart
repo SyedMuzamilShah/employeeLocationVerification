@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_desktop_app/core/provider/main_content_provider.dart';
+import 'package:my_desktop_app/core/provider/route_provider.dart';
+import 'package:my_desktop_app/core/widgets/loading_widget.dart';
 import 'package:my_desktop_app/core/widgets/my_dialog_box.dart';
+import 'package:my_desktop_app/core/widgets/route_display_widget.dart';
 import 'package:my_desktop_app/features/employee/data/models/request/employee_prams.dart';
 import 'package:my_desktop_app/features/employee/domain/entities/employee_filter_enum_entities.dart';
+import 'package:my_desktop_app/features/employee/presentation/providers/employee_data_provider.dart';
+import 'package:my_desktop_app/features/employee/presentation/views/employee_detail_view.dart';
 import 'package:my_desktop_app/features/employee/presentation/widgets/employee_add_card.dart';
-import 'package:my_desktop_app/features/employee/presentation/widgets/employee_list_view.dart';
+import 'package:my_desktop_app/features/employee/presentation/widgets/employee_card_widget.dart';
+import 'package:my_desktop_app/features/employee/presentation/widgets/employee_error_widget.dart';
+import 'package:my_desktop_app/features/employee/presentation/widgets/employee_route.dart';
 import 'package:my_desktop_app/features/employee/presentation/widgets/employee_search_field_widget.dart';
+import 'package:my_desktop_app/features/employee/presentation/widgets/employee_state_widget.dart';
+import 'package:my_desktop_app/features/organization/presentation/providers/organization_provider.dart';
 
 class MyEmployeeView extends ConsumerStatefulWidget {
   const MyEmployeeView({super.key});
@@ -29,14 +39,29 @@ class _MyEmployeeViewState extends ConsumerState<MyEmployeeView> {
 
   @override
   Widget build(BuildContext context) {
+    // Check the organization is selected
+    final selectedOrg = ref.watch(organizationProvider).selectedOrganization;
+
+    // If organization is not selected then show the message and return;
+    if (selectedOrg == null) {
+      return const Center(child: Text("Please select organization first"));
+    }
+
+    // if the organization is selected so picked the organizationId
+    final params =
+        _employeeParams.copyWith(organizationId: selectedOrg.organizationId);
+
+    // load the employee
+    final employee = ref.watch(loadEmployeeProvider(params));
+
     return Scaffold(
-      body: Column(
-        children: [
-          // Animated filter chips
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16),
-            child: SizedBox(
-              height: 50,
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          spacing: 10,
+          children: [
+            SizedBox(
+              height: 40,
               child: ListView.separated(
                 shrinkWrap: true,
                 scrollDirection: Axis.horizontal,
@@ -66,23 +91,70 @@ class _MyEmployeeViewState extends ConsumerState<MyEmployeeView> {
                 },
               ),
             ),
-          ),
 
-          // Search bar with animation
-          EmployeeSearchBar(
-            controller: _searchController,
-            onChanged: _onSearchChanged,
-            initialParams: _employeeParams,
-            onAdvancedSearch: (value) {
-              print("Advanced search");
-            },
-          ),
+            // Search bar with animation
+            EmployeeSearchBar(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              initialParams: _employeeParams,
+              onAdvancedSearch: (value) {
+                print("Advanced search");
+              },
+            ),
 
-          // Employee list
-          Expanded(
-            child: EmployeeListView(_employeeParams, _selectedFilter.name),
-          ),
-        ],
+            // Employee list
+            Expanded(
+              child: RefreshIndicator(
+                // the function which hit the server
+                onRefresh: () async {
+                  ref.invalidate(loadEmployeeProvider);
+                },
+                child: employee.when(
+                  loading: () => const Center(child: MyLoadingWidget()),
+                  error: (error, stack) => EmployeeErrorWidget(
+                    error: error,
+                    onRetry: () async {
+                      ref.invalidate(loadEmployeeProvider);
+                    },
+                  ),
+                  data: (data) {
+                    if (data.isEmpty) {
+                      // if the data is empty then this widget is show
+                      return EmptyStateWidget(
+                        message: 'No ${_selectedFilter.name} employees found',
+                        onRefresh: () async {
+                          ref.invalidate(loadEmployeeProvider);
+                        },
+                      );
+                    }
+                    return ListView.builder(
+                      itemCount: data.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          // On Click the detial of the employee open
+                          onTap: () {
+                            // Change the route
+                            ref.read(routeDisplayProvider.notifier).state =
+                                RouteDisplayItem(route: EmployeeRoute(name: data[index].name,));
+
+                            // change the main content
+                            mainContentWidget.value =
+                                EmployeeDetailView(employee: data[index]);
+                          },
+                          child: EmployeeCard(
+                            readParams: params,
+                            onStatusChanged: null,
+                            employee: data[index],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => showMyDialog(context, const EmployeeAddWidget()),

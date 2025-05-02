@@ -78,9 +78,9 @@ class EmployeeRemoteDataSourceImpl implements EmployeeRemoteDataSource {
   Future<bool> allowPictureForProcessing(Map<String, dynamic> params) async {
     try {
       final response = await _apiServices.patchRequest(
-          endPoint: ServerUrl.employeeStatusChangeRoute, body: params);
-      if (response.statusCode == 200) {
-        
+          endPoint: ServerUrl.employeePictureAllowForProcessing, body: params);
+      if (response.statusCode == 204) {
+        return true;
       }
       throw Exception("");
     } catch (e) {

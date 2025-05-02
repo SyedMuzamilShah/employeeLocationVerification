@@ -69,9 +69,9 @@ class EmployeeUpdateParams extends Equatable {
   final String? name;
   final String? email;
   final String? phoneNumber;
-  final String? role;
+  final EmployeeRole? role;
   final File? image;
-  final String? status;
+  final EmployeeStatus? status;
 
   const EmployeeUpdateParams({
     required this.id,

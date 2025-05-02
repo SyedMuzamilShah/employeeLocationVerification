@@ -4,7 +4,7 @@ import 'package:my_desktop_app/core/provider/route_provider.dart';
 import 'package:my_desktop_app/core/widgets/loading_widget.dart';
 import 'package:my_desktop_app/features/dashboard/presentation/providers/view_provider.dart';
 import 'package:my_desktop_app/features/organization/presentation/views/organization_view.dart';
-import 'package:my_desktop_app/features/organization/presentation/widgets/route_widget.dart';
+import 'package:my_desktop_app/features/organization/presentation/widgets/organization_route_widget.dart';
 import 'package:my_desktop_app/features/overview/presentation/views/overview_view.dart';
 
 class MyDashBoradOverView extends ConsumerWidget {

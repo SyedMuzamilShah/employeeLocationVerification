@@ -1,159 +1,118 @@
 import 'package:flutter/material.dart';
 import 'package:my_desktop_app/features/task/domain/entities/task_entities.dart';
 import 'package:my_desktop_app/features/task/presentation/widgets/location_indicator_widget.dart';
-import 'package:my_desktop_app/features/task/presentation/widgets/priority_badge_widget.dart';
 import 'package:my_desktop_app/features/task/presentation/widgets/status_chip_widget.dart';
-import 'package:my_desktop_app/features/task/presentation/widgets/task_completion_dialog_widget.dart';
 import 'package:my_desktop_app/features/task/presentation/widgets/task_model.dart';
-import 'package:my_desktop_app/features/task/presentation/widgets/task_verification_dialog_widget.dart';
 import 'package:my_desktop_app/features/task/presentation/widgets/user_avatar_widget.dart';
-
 
 class TaskCard extends StatelessWidget {
   final TaskEntities taskModel;
 
-  const TaskCard({
-    super.key,
-    required this.taskModel
-  });
+  const TaskCard({super.key, required this.taskModel});
 
   @override
   Widget build(BuildContext context) {
-    // final assignee = task.assigneeId != null
-    //     ? users.firstWhere((u) => u.id == task.assigneeId,
-    //         orElse: () => users.first)
-    //     : null;
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
-    
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       elevation: 2,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: theme.dividerColor),
       ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () => _handleCardTap(context),
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      taskModel.title,
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Title + Status
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    taskModel.title,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: colorScheme.primary,
                     ),
                   ),
-                  PriorityBadge(priority: TaskPriority.high),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                taskModel.description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodyMedium,
-              ),
-              if (taskModel.location != null) ...[
-                const SizedBox(height: 8),
-                LocationIndicator(location: taskModel.location!),
+                ),
+                StatusChip(
+                  status: taskModel.status,
+                  onStatusChange: (value) {
+                    debugPrint('Status changed to $value');
+                  },
+                ),
               ],
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  StatusChip(
-                    // status: taskModel.status,
-                    status: taskModel.status,
-                    onStatusChange: (value){},
-                  ),
-                  const Spacer(),
-                  // if (assignee != null) UserAvatar(user: assignee),
-                  UserAvatar(user: AppUser(id: 'dfg', name: 'tes', email: 'tas')),
-                  UserAvatar(user: AppUser(id: 'hello', name: 'hello', email: 'tas')),
-                  UserAvatar(user: AppUser(id: 'game', name: 'game', email: 'tas')),
-                ],
+            ),
+      
+            const SizedBox(height: 12),
+            const Divider(height: 1),
+      
+            /// Info Section
+            const SizedBox(height: 12),
+            _infoRow(
+              context,
+              label: "Description",
+              value: taskModel.description,
+            ),
+            if (taskModel.location != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: LocationIndicator(location: taskModel.location!),
               ),
-              
-            //   if (task.status == TaskStatus.completed &&
-            //       task.verifiedBy == null) ...[
-            //     const SizedBox(height: 8),
+      
+            const SizedBox(height: 16),
+      
+            /// Assignees
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
             //     Text(
-            //       'Pending Verification',
-            //       style: TextStyle(
-            //         color: Colors.orange[700],
-            //         fontWeight: FontWeight.bold,
+            //       "Assignees",
+            //       style: theme.textTheme.bodyMedium?.copyWith(
+            //         fontWeight: FontWeight.w500,
             //       ),
             //     ),
-            //   ] else if (task.verifiedBy != null) ...[
-            //     const SizedBox(height: 8),
-            //     Text(
-            //       'Verified by ${_getUserName(task.verifiedBy!)}',
-            //       style: TextStyle(
-            //         color: Colors.green[700],
-            //         fontWeight: FontWeight.bold,
-            //       ),
-            //     ),
+            //     Row(children: _buildAssigneeAvatars()),
             //   ],
-            ],
-          ),
+            // ),
+          ],
         ),
       ),
     );
   }
 
-  void _handleCardTap(BuildContext context) {
-  //   if (!isAdmin &&
-  //       task.assigneeId == currentUserId &&
-  //       task.status != TaskStatus.completed) {
-      // _showCompletionDialog(context);
-  //   } else if (isAdmin &&
-  //       task.status == TaskStatus.completed &&
-  //       task.verifiedBy == null) {
-      _showVerificationDialog(context);
-  //   } else {
-  //     onTap();
-  //   }
-  }
-
-  Future<void> _showCompletionDialog(BuildContext context) async {
-    final result = await showDialog<TaskEntities>(
-      context: context,
-      builder: (context) => TaskCompletionDialog(
-        task: taskModel,
-        currentUserId: taskModel.adminId,
-        // task: task,
-        // currentUserId: currentUserId,
-      ),
+  Widget _infoRow(BuildContext context, {required String label, required String value}) {
+    final theme = Theme.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "$label: ",
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: theme.textTheme.bodySmall,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+          ),
+        ),
+      ],
     );
-    if (result != null) {
-      // onTaskCompletion(result);
-    }
   }
 
-  Future<void> _showVerificationDialog(BuildContext context) async {
-    final verified = await showDialog<bool>(
-      context: context,
-      builder: (context) => TaskVerificationDialog(
-        task: taskModel,
-        currentUserId: taskModel.adminId,
-      ),
-    );
-    // if (verified != null) {
-      // onTaskVerification(task, verified);
-  //   }
+  List<Widget> _buildAssigneeAvatars() {
+    return [
+      UserAvatar(user: AppUser(id: '1', name: 'John', email: 'john@example.com')),
+      const SizedBox(width: 4),
+      UserAvatar(user: AppUser(id: '2', name: 'Alice', email: 'alice@example.com')),
+    ];
   }
-
-  // String _getUserName(String userId) {
-  //   try {
-  //     return users.firstWhere((user) => user.id == userId).name;
-  //   } catch (e) {
-  //     return 'Admin';
-  //   }
-  // }
 }

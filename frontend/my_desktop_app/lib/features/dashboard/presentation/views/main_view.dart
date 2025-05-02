@@ -3,13 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_desktop_app/core/provider/main_content_provider.dart';
 import 'package:my_desktop_app/core/provider/route_provider.dart';
 import 'package:my_desktop_app/core/widgets/loading_widget.dart';
+import 'package:my_desktop_app/core/widgets/route_display_widget.dart';
 import 'package:my_desktop_app/features/attandence/presentation/views/attendence_view.dart';
 import 'package:my_desktop_app/features/dashboard/presentation/providers/view_provider.dart';
 import 'package:my_desktop_app/features/dashboard/presentation/widgets/sidebar_widget.dart';
 import 'package:my_desktop_app/features/dashboard/presentation/widgets/top_bar_widget.dart';
 import 'package:my_desktop_app/features/employee/presentation/views/employee_view.dart';
 import 'package:my_desktop_app/features/organization/presentation/views/organization_view.dart';
-import 'package:my_desktop_app/features/organization/presentation/widgets/route_widget.dart';
+import 'package:my_desktop_app/features/organization/presentation/widgets/organization_route_widget.dart';
 import 'package:my_desktop_app/features/overview/presentation/views/overview_view.dart';
 import 'package:my_desktop_app/features/settings/presentation/views/settings_view.dart';
 import 'package:my_desktop_app/features/task/presentation/views/my_task_view.dart';
@@ -87,24 +88,24 @@ class _MyDashBoradState extends ConsumerState<MyDashBorad> {
         break;
       case 1:
         breadcrumbNotifier.state =
-            RouteDisplayItem(route: Text('employees', style: routeStyle));
+            RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Employee'));
         mainContentWidget.value = MyEmployeeView();
         break;
       case 2:
         breadcrumbNotifier.state =
-            RouteDisplayItem(route: Text('attendance', style: routeStyle));
+            RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Attendance'));
         mainContentWidget.value = MyAttendenceView();
 
         break;
       case 3:
         breadcrumbNotifier.state =
-            RouteDisplayItem(route: Text('tasks', style: routeStyle));
+            RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Tasks'));
         mainContentWidget.value = MyTaskView();
 
         break;
       case 4:
         breadcrumbNotifier.state =
-            RouteDisplayItem(route: Text('settings', style: routeStyle));
+            RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Settings'));
         mainContentWidget.value = MySettingView();
         break;
     }

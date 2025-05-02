@@ -49,6 +49,10 @@ export const employeeAddControllerForAdmin = controllerHandler(async (req, res) 
             .json(new SuccessResponse(STATUS_CODES.CREATED, 'Employee created successfully', {
                 user: user, tokens
             }).toJson());
+            
+        // if (imageUrl){
+        //     employeeImageAllowControllerForAdmin(req, req.user._id = adminId)
+        // }
 
     } catch (err) {
         console.error("Error creating employee:", err.message);

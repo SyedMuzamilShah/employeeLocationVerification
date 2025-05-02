@@ -11,6 +11,13 @@ class EmployeeEntities {
   final DateTime? updatedAt;
   final String? role;
 
+  // Additional fields
+  final String? imageUrl;
+  bool uploadNewImage;
+  bool imageAcceptedForToken;
+  final String? userName;
+  final String? employeeId;
+
   EmployeeEntities({
     required this.id,
     required this.organizationId,
@@ -20,6 +27,11 @@ class EmployeeEntities {
     required this.status,
     required this.createdAt,
     this.updatedAt,
-    this.role, 
+    this.role,
+    this.imageUrl,
+    this.uploadNewImage = false,
+    this.imageAcceptedForToken = false,
+    this.userName,
+    this.employeeId,
   });
 }

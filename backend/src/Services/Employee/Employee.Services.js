@@ -21,7 +21,8 @@ export const employeeImageUploadServices = async (dataObject) => {
         const employee = await employeeModel.findOne(
             {
               $and: [
-                { _id: employeeId }, {organizationId : organizationId}
+                // { _id: employeeId }, {organizationId : organizationId}
+                { _id: employeeId }
               ]
             }
           ).select("imageAcceptedForToken")

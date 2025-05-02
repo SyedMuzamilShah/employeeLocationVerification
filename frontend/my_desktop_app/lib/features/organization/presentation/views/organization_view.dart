@@ -28,7 +28,6 @@ class _OrganizationViewState extends ConsumerState<OrganizationView> {
   Widget build(BuildContext context) {
     final state = ref.watch(organizationProvider);
     final notifier = ref.read(organizationProvider.notifier);
-
     return Scaffold(
       body: _buildBody(state, context, notifier),
       floatingActionButton: (state.selectedOrganization == null)

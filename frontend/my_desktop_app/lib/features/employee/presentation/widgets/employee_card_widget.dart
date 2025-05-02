@@ -22,10 +22,16 @@ class EmployeeCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final notifier = ref.read(employeeProvider.notifier);
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      color: theme.cardColor,
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: theme.dividerColor),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -37,8 +43,7 @@ class EmployeeCard extends ConsumerWidget {
               children: [
                 Text(
                   employee.name,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 EmployeeStatusBadge(status: employee.status.name),
               ],
@@ -48,11 +53,13 @@ class EmployeeCard extends ConsumerWidget {
             // Email
             Row(
               children: [
-                const Icon(Icons.email, size: 16, color: Colors.grey),
+                Icon(Icons.email, size: 16, color: colorScheme.onSurfaceVariant),
                 const SizedBox(width: 6),
                 Text(
                   employee.email,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
+                  ),
                 ),
               ],
             ),
@@ -64,12 +71,16 @@ class EmployeeCard extends ConsumerWidget {
               children: [
                 Text(
                   employee.organizationId,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                  ),
                 ),
                 if (employee.role != null)
                   Text(
                     employee.role!,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                    ),
                   ),
               ],
             ),
@@ -84,14 +95,16 @@ class EmployeeCard extends ConsumerWidget {
 
   Widget _buildActionButtons(
       WidgetRef ref, EmployeeNotifier notifier, BuildContext context) {
-    void handleStatusChange(EmployeeStatus status) async {
+    final colorScheme = Theme.of(context).colorScheme;
 
+    void handleStatusChange(EmployeeStatus status) async {
       final confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
           title: const Text('Confirm Action'),
           content: Text(
-              'Are you sure you want to mark this employee as ${status.name}?'),
+            'Are you sure you want to mark this employee as ${status.name}?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -110,12 +123,10 @@ class EmployeeCard extends ConsumerWidget {
           employeeId: employee.id,
           status: status,
         );
-        var success = await notifier.employeeStatusChange(params);
+        final success = await notifier.employeeStatusChange(params);
         if (context.mounted && success) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Status updated to ${status.name}'),
-            ),
+            SnackBar(content: Text('Status updated to ${status.name}')),
           );
         }
         ref.invalidate(loadEmployeeProvider(readParams));
@@ -130,8 +141,8 @@ class EmployeeCard extends ConsumerWidget {
             onPressed: onStatusChanged ??
                 () => handleStatusChange(EmployeeStatus.pending),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange.shade800,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.secondary,
+              foregroundColor: colorScheme.onSecondary,
             ),
             child: const Text('Set to Pending'),
           ),
@@ -142,23 +153,23 @@ class EmployeeCard extends ConsumerWidget {
     if (employee.status == EmployeeStatus.pending) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.end,
-        spacing: 8,
         children: [
           ElevatedButton(
             onPressed: onStatusChanged ??
                 () => handleStatusChange(EmployeeStatus.verified),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.tertiary,
+              foregroundColor: colorScheme.onTertiary,
             ),
             child: const Text('Verify'),
           ),
+          const SizedBox(width: 8),
           ElevatedButton(
             onPressed: onStatusChanged ??
                 () => handleStatusChange(EmployeeStatus.rejected),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
+              backgroundColor: colorScheme.error,
+              foregroundColor: colorScheme.onError,
             ),
             child: const Text('Reject'),
           ),

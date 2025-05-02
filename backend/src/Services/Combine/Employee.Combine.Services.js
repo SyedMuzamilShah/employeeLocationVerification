@@ -56,8 +56,13 @@ export const getEmployeeServices = async (dataObject) => {
                 { role: { $regex: search, $options: 'i' } }
             ];
         }
-
-        const employees = await employeeModel.find(query);
+        console.log(query)
+        let employees;
+        if (adminId){
+            employees = await employeeModel.find(query).select('+imageAcceptedForToken');
+        }else {
+            employees = await employeeModel.find(query);
+        }
 
         return { user: employees };
     } catch (error) {
