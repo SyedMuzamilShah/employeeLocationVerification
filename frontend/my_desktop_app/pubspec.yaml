@@ -39,7 +39,7 @@ dependencies:
   shared_preferences: ^2.5.2
   flutter_riverpod: ^2.6.1
   get_it: ^8.0.3
-  geolocator: ^13.0.3
+  # geolocator: ^13.0.3
   syncfusion_flutter_charts: ^28.2.12
   syncfusion_flutter_maps: ^28.2.12
   sidebarx: ^0.17.1
@@ -77,8 +77,9 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
+  assets:
+    - assets/
+    - assets/logo/
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

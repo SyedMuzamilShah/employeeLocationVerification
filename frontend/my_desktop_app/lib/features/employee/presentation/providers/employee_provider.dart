@@ -7,7 +7,7 @@ import 'package:my_desktop_app/features/employee/data/repositories/employee_repo
 import 'package:my_desktop_app/features/employee/domain/entities/employee_entities.dart';
 import 'package:my_desktop_app/features/employee/domain/usecases/employee_usecase.dart';
 
-final employeeProvider = StateNotifierProvider<EmployeeNotifier, EmployeeState>(
+final employeeProvider = StateNotifierProvider.autoDispose<EmployeeNotifier, EmployeeState>(
     (ref) => EmployeeNotifier());
 
 class EmployeeNotifier extends StateNotifier<EmployeeState> {
@@ -54,7 +54,7 @@ class EmployeeNotifier extends StateNotifier<EmployeeState> {
         (_) => state = state.copyWith(
           isLoading: false,
           employees:
-              state.employees.where((org) => org.id != prams.id).toList(),
+              state.employees.where((org) => org.id != prams.employeeId).toList(),
           errorMessage: null,
         ),
       );

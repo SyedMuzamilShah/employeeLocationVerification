@@ -74,7 +74,9 @@ class BasicAuthProviderNotifier extends StateNotifier<BasicAuthProviderState> {
         if (kDebugMode) {
           print("Success Called register function");
         }
-        _clearLoadingState();
+        // _clearLoadingState();
+        state = state.clear();
+        state = state.copyWith(successMessage: "User Created Successfully");
         return true;
       },
     );

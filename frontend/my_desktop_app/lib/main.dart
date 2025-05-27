@@ -38,7 +38,7 @@ class MyApp extends ConsumerWidget {
     // ValueNotifier<Widget> valueNotifier = ValueNotifier(Container());
     return MaterialApp(
       // navigatorKey: navigatorKey,
-      title: 'Flutter Demo',
+      title: 'LOCAFI',
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
       debugShowCheckedModeBanner: false,

@@ -40,11 +40,12 @@ SidebarXTheme mySidebarXTheme(BuildContext context) {
       borderRadius: BorderRadius.circular(12),
       gradient: LinearGradient(
         colors: [
-          colorScheme.primary.withValues(alpha: 0.15),
-          colorScheme.secondary.withValues(alpha: 0.1)
+          colorScheme.primary.withValues(alpha: 0.2),
+          // colorScheme.primary.withValues(alpha: 0.3),
+          colorScheme.primary.withValues(alpha: 0.2),
         ],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
+        begin: Alignment.centerRight,
+        end: Alignment.centerLeft,
       ),
       boxShadow: [
         BoxShadow(

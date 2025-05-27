@@ -12,21 +12,17 @@ class OrganizationRoute extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(organizationProvider);
-
     return RouteDisplayWidget(
       routeText: 'Organization',
-      routeTextClick: () {
-        // TODO: if you want to show the oganizationView then clear the saved organization
-        // from local data base
-        // notifier.clearAll();
-        // notifier.read();
+      routeTextClick: () async {
         ref.read(routeDisplayProvider.notifier).state = RouteDisplayItem(
             route: RouteDisplayWidget(routeText: 'Organization'));
         mainContentWidget.value = OrganizationView();
+
+        await ref.read(organizationProvider.notifier).clearOrganizationSaved();
         return;
       },
-      subRouteText: name ?? state.selectedOrganization?.name,
+      subRouteText: name,
     );
   }
 }

@@ -34,11 +34,11 @@ class OrganizationCardWidget extends ConsumerWidget {
     }
   }
     return Card(
-      elevation: 8,
+      elevation: 3,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-      shadowColor: Colors.black.withValues(alpha: 0.2),
+      shadowColor: Colors.black.withValues(alpha: 0.9),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -97,13 +97,14 @@ class OrganizationCardWidget extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                MyCustomButton(
-                  onClick: () {
-                    // Add action for visiting website if available
-                  },
-                  btnText: "Visit Website",
-                  color: Colors.blueAccent,
-                ),
+                // MyCustomButton(
+                //   onClick: () {
+                //     // Add action for visiting website if available
+                //   },
+                //   btnText: "Visit Website",
+                //   color: Colors.blueAccent,
+                // ),
+                SizedBox(),
                 MyCustomButton(
                   onClick: () async {
                     handleSelect();

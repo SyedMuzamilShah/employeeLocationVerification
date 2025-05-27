@@ -1,30 +1,59 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
-import 'package:my_mobile_app/main.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  final container = ProviderContainer();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  final notifier = container.read(testinTaskParamsProvider.notifier);
+  final state = container.read(testinTaskParamsProvider);
+  notifier.state = state.copyWith(taskId: 'taskId Change');
+  notifier.state = state.copyWith(userId: 'userId Change');
+  // final state = container.read(testinTaskParamsProvider);
+  // // Update state correctly using 'notifier.state = ...'
+  // notifier.state =
+  //     container.read(testinTaskParamsProvider).copyWith(taskId: 'taskid change');
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+  // notifier.state =
+  //     container.read(testinTaskParamsProvider).copyWith(location: 'Change in next page');
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+  final updated = container.read(testinTaskParamsProvider);
+  print(updated.toJson());
+}
+
+
+final testinTaskParamsProvider = StateProvider((ref) {
+  return TestingTaskParams(taskId: '', userId: '', search: '', location: '');
+});
+
+final class TestingTaskParams extends Equatable {
+  final String taskId;
+  final String userId;
+  final String search;
+  final String location;
+  const TestingTaskParams(
+      {required this.taskId,
+      required this.userId,
+      required this.search,
+      required this.location});
+
+  TestingTaskParams copyWith(
+      {String? taskId, String? userId, String? search, String? location}) {
+    return TestingTaskParams(
+        taskId: taskId ?? this.taskId,
+        userId: userId ?? this.userId,
+        search: search ?? this.search,
+        location: location ?? this.location);
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'taskId' : taskId,
+      'userId' : userId,
+      'search' : search,
+      'location' : location
+    };
+  }
+
+  @override
+  List<Object?> get props => [taskId, userId, search, location];
 }

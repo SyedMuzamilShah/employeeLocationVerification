@@ -7,6 +7,7 @@ import 'package:my_desktop_app/core/widgets/my_button.dart';
 import 'package:my_desktop_app/core/widgets/my_text_field.dart';
 import 'package:my_desktop_app/features/employee/data/models/request/employee_prams.dart';
 import 'package:my_desktop_app/features/employee/domain/entities/employee_filter_enum_entities.dart';
+import 'package:my_desktop_app/features/employee/presentation/providers/employee_data_provider.dart';
 import 'package:my_desktop_app/features/employee/presentation/providers/employee_provider.dart';
 import 'package:my_desktop_app/features/organization/presentation/providers/organization_provider.dart';
 
@@ -20,9 +21,9 @@ class EmployeeAddWidget extends StatefulWidget {
 class EmployeeAddWidgetState extends State<EmployeeAddWidget> {
   final _formKey = GlobalKey<FormState>();
   // final List<String> _roles = ['Servant', 'Manager', 'Security'];
-  final List<String> _countryCodes = ['+1', '+44', '+91', '+86', '+33'];
+  final List<String> _countryCodes = ['+92'];
 
-  String? _selectedCountryCode = '+91';
+  String? _selectedCountryCode = '+92';
   String? _selectedRole;
   File? _profileImage;
 
@@ -62,7 +63,7 @@ class EmployeeAddWidgetState extends State<EmployeeAddWidget> {
             final orgState =
                 ref.watch(organizationProvider).selectedOrganization;
             final organizationId =
-                orgState?.organizationId ?? 'No organization selected';
+                orgState?.id ?? 'No organization selected';
             final state = ref.watch(employeeProvider);
             final notifier = ref.watch(employeeProvider.notifier);
 
@@ -349,6 +350,7 @@ class EmployeeAddWidgetState extends State<EmployeeAddWidget> {
                                     final created =
                                         await notifier.addEmployee(prams);
                                     if (created && context.mounted) {
+                                      ref.invalidate(loadEmployeeProvider);
                                       Navigator.pop(context);
                                     }
                                   }

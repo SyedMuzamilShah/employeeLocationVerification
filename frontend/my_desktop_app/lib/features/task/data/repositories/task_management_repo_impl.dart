@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:my_desktop_app/core/failure/failure.dart';
 import 'package:my_desktop_app/features/task/data/datasources/task_datasources.dart';
 import 'package:my_desktop_app/features/task/data/models/request/task_managment_parmas.dart';
+import 'package:my_desktop_app/features/task/data/models/request/task_verified_params.dart';
 import 'package:my_desktop_app/features/task/data/models/response/task_management_response.dart';
 import 'package:my_desktop_app/features/task/domain/entities/task_managemanat_entities.dart';
 import 'package:my_desktop_app/features/task/domain/repositories/task_repo.dart';
@@ -49,14 +50,11 @@ class TaskManagementRepoImpl extends TaskManagementRepo {
   }
 
   @override
-  Future<Either<Failure, TaskManagementEntities>> taskStatusChange(
+  Future<Either<Failure, void>> taskStatusChange(
       TaskStatusChangeParams params) async {
     final response = await _dataSources.taskStatusChange(params.toJson());
     return response.fold((err) => Left(err), (succ) {
-      print("Testing.................... Object");
-      print(succ['data']);  
-      return Right(
-          TaskManagementResponseModel.fromJson(succ['data']['task']));
+      return Right(null);
     });
   }
 }

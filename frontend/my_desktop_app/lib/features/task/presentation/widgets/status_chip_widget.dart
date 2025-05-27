@@ -15,10 +15,10 @@ class StatusChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = switch (status) {
       TaskStatus.all => Colors.yellow,
-      TaskStatus.pending => Colors.blue,
-      TaskStatus.inProgress => Colors.purple,
+      // TaskStatus.pending => Colors.blue,
+      // TaskStatus.inProgress => Colors.purple,
       TaskStatus.completed => Colors.green,
-      TaskStatus.cancelled => Colors.grey,
+      // TaskStatus.cancelled => Colors.grey,
       TaskStatus.created => Colors.brown,
       TaskStatus.assigned => Colors.pink,
     };
@@ -27,10 +27,10 @@ class StatusChip extends StatelessWidget {
       onTap: () {
         final newStatus = switch (status) {
           TaskStatus.all => TaskStatus.all,
-          TaskStatus.pending => TaskStatus.inProgress,
-          TaskStatus.inProgress => TaskStatus.completed,
-          TaskStatus.completed => TaskStatus.pending,
-          TaskStatus.cancelled => TaskStatus.pending,
+          // TaskStatus.pending => TaskStatus.inProgress,
+          // TaskStatus.inProgress => TaskStatus.completed,
+          TaskStatus.completed => TaskStatus.completed,
+          // TaskStatus.cancelled => TaskStatus.pending,
           TaskStatus.created => TaskStatus.created,
           TaskStatus.assigned => TaskStatus.assigned,
         };

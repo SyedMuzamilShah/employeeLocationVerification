@@ -23,6 +23,7 @@ class TaskResponseModel extends TaskEntities {
     required super.createdAt,
     required super.updatedAt,
     super.location,
+    super.aroundDistanceMeter
   });
 
   factory TaskResponseModel.fromJson(Map<String, dynamic> json) {
@@ -39,6 +40,7 @@ class TaskResponseModel extends TaskEntities {
       location: json['location'] != null
           ? LocationModel.fromJson(json['location'])
           : null,
+      aroundDistanceMeter: json['aroundDistanceMeter']?.toDouble()
 
     );
   }

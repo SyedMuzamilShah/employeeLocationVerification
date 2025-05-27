@@ -1,55 +1,47 @@
 import 'package:flutter/material.dart';
-import 'package:my_mobile_app/testing/face_view.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';  
-final homeIndexProvider = StateProvider<int>((ref) {
-  return 0;
-});
-void main() {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:my_mobile_app/core/provider/theme_provider.dart';
+import 'package:my_mobile_app/core/routes/routes.dart';
+import 'package:my_mobile_app/core/services/local_database_service.dart';
+import 'package:my_mobile_app/core/services/token_service.dart';
+import 'package:my_mobile_app/core/theme/app_theme.dart';
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    ProviderScope(child: MyApp())
-  );
+  await TokenService().initialize();
+  await Hive.initFlutter();
+  await LocalDatabaseService().init(); // Initialize local database
+  runApp(ProviderScope(child: const MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+// ValueNotifier<Widget> valueNotifier = ValueNotifier(MyHomePage());
+
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends ConsumerWidget {
-  const MyHomePage({super.key});
-
+  // static final GlobalKey<NavigatorState> navigatorKey =
+  //     GlobalKey<NavigatorState>();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    List<Widget> bodyItems = [
-      Text("Testing..."),
-      FaceViewTesting()
-    ];
-    return Scaffold(
-      body: bodyItems[ref.watch(homeIndexProvider)],
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) => ref.read(homeIndexProvider.notifier).state = index,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
-          ),
-        ],
-      ),
+    final themeMode = ref.watch(themeProvider);
+    // ValueNotifier<Widget> valueNotifier = ValueNotifier(Container());
+    return MaterialApp(
+      // navigatorKey: navigatorKey,
+      title: 'Flutter Demo',
+      theme: AppThemes.lightTheme,
+      darkTheme: AppThemes.darkTheme,
+      debugShowCheckedModeBanner: false,
+      themeMode: themeMode,
+      initialRoute: AppRoutes.splash,
+      onGenerateRoute: AppRoutes.onGenerateRoute,
+      // routes: {
+      //   '/': (context) => SidebarXExampleApp(),
+      //   '/': (context) => const MyDrawerWidget(),
+      //   '/': (context) => const DashboardScreen(),
+      //   '/': (context) => MyTestingApp(),
+      //   '/about': (context) => const AboutPage(),
+      //   '/contact': (context) => const ContactPage(),
+      // },
     );
   }
 }

@@ -46,6 +46,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
   Future<bool> create({required TaskCreateParams model}) async {
     try {
       state = TaskState.initial();
+      state = state.copyWith(isLoading: true);
       final response = await _useCase.create(model);
 
       return response.fold(
@@ -73,8 +74,6 @@ class TaskNotifier extends StateNotifier<TaskState> {
             errorMessage: null,
             errorList: null,
           );
-          print("With in provider");
-          print(state.currentTask);
           return true;
         },
       );
@@ -116,17 +115,21 @@ class TaskNotifier extends StateNotifier<TaskState> {
     }
   }
 
-  Future<void> update(TaskUpdateParams model) async {
+  Future<bool> update(TaskUpdateParams model) async {
+    print(model.toJson());
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
       final response = await _useCase.update(model);
 
-      response.fold(
-        (failure) => state = state.copyWith(
-          isLoading: false,
-          errorMessage: failure.message,
-        ),
-        (updatedOrg) {
+      return response.fold(
+        (failure){
+          state = state.copyWith(
+            isLoading: false,
+            errorMessage: failure.message,
+          );
+          return false;
+        },
+        (updatedOrg){
           final updatedList = state.task
               .map((org) => org.id == updatedOrg.id ? updatedOrg : org)
               .toList();
@@ -136,6 +139,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
             task: updatedList,
             errorMessage: null,
           );
+          return true;
         },
       );
     } catch (e) {
@@ -143,6 +147,7 @@ class TaskNotifier extends StateNotifier<TaskState> {
         isLoading: false,
         errorMessage: 'Failed to update organization: $e',
       );
+      return false;
     }
   }
 

@@ -88,7 +88,8 @@ class _MyTaskViewState extends ConsumerState<MyTaskView> {
 
                             // change the main content
                             mainContentWidget.value =
-                                TaskDetailView(task: data[index]);
+                                TaskDetailView(
+                                  task: data[index]);
                             },
                             child: TaskCard(taskModel: data[index]));
                       },
@@ -124,7 +125,7 @@ class _MyTaskViewState extends ConsumerState<MyTaskView> {
           // ),
           FloatingActionButton(
             heroTag: 'Create',
-            onPressed: () => showMyDialog(context, TaskForm()),
+            onPressed: () => showMyDialog(context, TaskForm(), width: 400, height: 600),
             tooltip: 'Create New Task',
             child: Icon(Icons.add),
           ),

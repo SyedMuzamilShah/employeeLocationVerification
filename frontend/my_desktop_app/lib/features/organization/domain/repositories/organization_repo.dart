@@ -16,6 +16,7 @@ abstract class OrganizationRepo {
 
   Future<Map<String, dynamic>?> isOrganizationSaved();
   Future<void> organizationSaved(Map<String, dynamic> organization);
+  Future<void> clearOrganization();
 }
 
 // // Create

@@ -209,6 +209,11 @@ class OrganizationNotifier extends StateNotifier<OrganizationState> {
     }
   }
 
+  Future<void> clearOrganizationSaved () async {
+    state = state.copyWith(selectedOrganization: null);
+    await _useCase.clearOrganization();
+  }
+
   Future<bool> organizationSaved(OrganizationEntities organization) async {
     try {
       // create the organization map which field want to store

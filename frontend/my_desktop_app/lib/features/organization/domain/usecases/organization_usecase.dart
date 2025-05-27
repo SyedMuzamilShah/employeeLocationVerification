@@ -12,6 +12,7 @@ abstract class OrganizationUsecase {
 
   Future<Map<String, dynamic>?> isOrganizationSaved();
   Future<void> organizationSaved(Map<String, dynamic> organization);
+  Future<void> clearOrganization();
 }
 
 
@@ -65,6 +66,11 @@ class OrganizationUseCaseImpl extends OrganizationUsecase {
   @override
   Future<void> organizationSaved(Map<String, dynamic> organization) async {
     await _repo.organizationSaved(organization);
+  }
+  
+  @override
+  Future<void> clearOrganization() async {
+    await _repo.clearOrganization();
   }
 }
 

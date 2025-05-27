@@ -4,13 +4,17 @@ import 'package:my_desktop_app/core/widgets/loading_widget.dart';
 import 'package:my_desktop_app/core/widgets/my_button.dart';
 import 'package:my_desktop_app/features/employee/data/models/request/employee_prams.dart';
 import 'package:my_desktop_app/features/employee/presentation/providers/employee_data_provider.dart';
+import 'package:my_desktop_app/features/employee/presentation/widgets/employee_search_field_widget.dart';
+import 'package:my_desktop_app/features/organization/presentation/providers/organization_provider.dart';
 import 'package:my_desktop_app/features/task/data/models/request/task_managment_parmas.dart';
 import 'package:my_desktop_app/features/task/domain/entities/task_entities.dart';
 import 'package:my_desktop_app/features/task/presentation/provider/task_managment_provider.dart';
+import 'package:my_desktop_app/features/task/presentation/provider/tast_detail_load_provider.dart';
 
 class SearchEmployeeAssignWidget extends ConsumerStatefulWidget {
-  final TaskEntities currentTask;
-  const SearchEmployeeAssignWidget({super.key, required this.currentTask});
+  final TaskEntities? currentTask;
+  final String? taskId;
+  const SearchEmployeeAssignWidget({super.key, this.currentTask, this.taskId});
 
   @override
   ConsumerState<SearchEmployeeAssignWidget> createState() =>
@@ -20,29 +24,39 @@ class SearchEmployeeAssignWidget extends ConsumerStatefulWidget {
 class _SearchEmployeeAssignWidgetState
     extends ConsumerState<SearchEmployeeAssignWidget> {
   final TextEditingController _controller = TextEditingController();
-  List<String> assignUserIds = [];
-  EmployeeReadParams _params = const EmployeeReadParams();
+  late EmployeeReadParams _params;
+  late Map<String, TaskAssignEmployeeParams> selectedEmployees;
+
+  @override
+  void initState() {
+    final orgId = ref.read(organizationProvider).selectedOrganization!.id;
+    selectedEmployees = {};
+    _params = EmployeeReadParams(organizationId: orgId);
+    super.initState();
+  }
 
   void _onAssignPressed() async {
     final notifier = ref.read(taskManagementProvider.notifier);
     final params = TaskAssignParams(
-      taskId: widget.currentTask.id,
-      employeesId: assignUserIds,
+      taskId: widget.currentTask?.id ?? widget.taskId ?? '',
+      employeesId: selectedEmployees.values.toList(),
     );
 
-    await notifier.taskAssign(params);
-
+    var response  = await notifier.taskAssign(params);
     final state = ref.read(taskManagementProvider);
-    if (state.error != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error: ${state.error}")),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Employees assigned successfully.")),
-      );
-      Navigator.pop(context); // Optionally close the dialog after assignment
+
+    if (!mounted) return;
+
+    final message = state.error != null
+        ? "Error: ${state.error}"
+        : "Employees assigned successfully.";
+    if (response){
+      ref.invalidate(loadTaskDetailProvider);
     }
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+
+    if (state.error == null) Navigator.pop(context);
   }
 
   @override
@@ -67,6 +81,14 @@ class _SearchEmployeeAssignWidgetState
           },
         ),
         const SizedBox(height: 12),
+        if (taskState.error != null)
+          Text(
+            taskState.error!,
+            style: Theme.of(context)
+                .textTheme
+                .bodyMedium!
+                .copyWith(color: Theme.of(context).colorScheme.error),
+          ),
         Expanded(
           child: employeeResponse.when(
             loading: () => const Center(child: MyLoadingWidget()),
@@ -80,23 +102,89 @@ class _SearchEmployeeAssignWidgetState
                 itemCount: employees.length,
                 itemBuilder: (context, index) {
                   final employee = employees[index];
-                  final isSelected = assignUserIds.contains(employee.id);
-
+                  final isSelected = selectedEmployees.containsKey(employee.id);
+                  final faceAllowed =
+                      selectedEmployees[employee.id]?.pictureAllowed ?? false;
+                  final faceVerification =
+                      selectedEmployees[employee.id]?.faceVerification ?? false;
                   return ListTile(
-                    title: Text(employee.name),
-                    subtitle: Text(employee.email),
-                    trailing: IconButton(
-                      icon: Icon(
-                        isSelected ? Icons.remove_circle : Icons.assignment_add,
-                        color: isSelected ? Colors.red : Colors.green,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          isSelected
-                              ? assignUserIds.remove(employee.id)
-                              : assignUserIds.add(employee.id);
-                        });
-                      },
+                    title: Text(employee.name ?? employee.userName!),
+                    // subtitle: Text(employee.email),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            isSelected ? Icons.remove_circle : Icons.assignment_add,
+                            color: isSelected ? Colors.red : Colors.green,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              if (isSelected) {
+                                selectedEmployees.remove(employee.id);
+                              } else {
+                                selectedEmployees[employee.id] =
+                                    TaskAssignEmployeeParams(
+                                  employeeId: employee.id,
+                                  faceVerification: false,
+                                  pictureAllowed: false
+                                );
+                              }
+                            });
+                          },
+                        ),
+                      
+                        Builder(builder: (_){
+                          if (isSelected) {
+                            return Row(
+                            spacing: 10,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: faceAllowed,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedEmployees[employee.id] =
+                                            selectedEmployees[employee.id]!
+                                                .copyWith(pictureAllowed: value);
+                                      });
+                                    },
+                                  ),
+                                  const Text("Faild store face"),
+                                ],
+                              ),
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: faceVerification,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        selectedEmployees[employee.id] =
+                                            selectedEmployees[employee.id]!
+                                                .copyWith(faceVerification: value);
+                                      });
+                                    },
+                                  ),
+                                  const Text("Face Verifiection"),
+                                ],
+                              ),
+                            ],
+                          );
+                          } else {
+                            return SizedBox.shrink();
+                          }
+                        })
+                          
+                      ],
+                    ),
+                    // Show checkbox if selected
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(employee.email),
+                      ],
                     ),
                   );
                 },
@@ -104,7 +192,7 @@ class _SearchEmployeeAssignWidgetState
             },
           ),
         ),
-        if (assignUserIds.isNotEmpty)
+        if (selectedEmployees.isNotEmpty)
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: MyCustomButton(
@@ -112,176 +200,6 @@ class _SearchEmployeeAssignWidgetState
               onClick: taskState.isLoading ? null : _onAssignPressed,
             ),
           ),
-      ],
-    );
-  }
-}
-
-
-
-class EmployeeSearchBar extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String> onChanged;
-  final EmployeeReadParams initialParams;
-  final ValueChanged<EmployeeReadParams> onAdvancedSearch;
-
-  const EmployeeSearchBar({
-    super.key,
-    required this.controller,
-    required this.onChanged,
-    required this.initialParams,
-    required this.onAdvancedSearch,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: SearchField(
-            controller: controller,
-            onChanged: onChanged,
-            // hintText: 'Search employees...',
-          ),
-        ),
-        IconButton(
-          icon: const Icon(Icons.filter_alt),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => AdvancedEmployeeSearchDialog(
-                initialParams: initialParams,
-                onApply: onAdvancedSearch,
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class SearchField extends StatelessWidget {
-  final TextEditingController controller;
-  final ValueChanged<String>? onChanged;
-
-  const SearchField({
-    super.key,
-    required this.controller,
-    this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        hintText: 'Search employees...',
-        prefixIcon: const Icon(Icons.search),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide.none,
-        ),
-        filled: true,
-        fillColor: Colors.grey.withValues(alpha: 0.1),
-        contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-      ),
-    );
-  }
-}
-
-class AdvancedEmployeeSearchDialog extends StatefulWidget {
-  final EmployeeReadParams initialParams;
-  final ValueChanged<EmployeeReadParams> onApply;
-
-  const AdvancedEmployeeSearchDialog({
-    super.key,
-    required this.initialParams,
-    required this.onApply,
-  });
-
-  @override
-  State<AdvancedEmployeeSearchDialog> createState() =>
-      _AdvancedEmployeeSearchDialogState();
-}
-
-class _AdvancedEmployeeSearchDialogState
-    extends State<AdvancedEmployeeSearchDialog> {
-  late EmployeeReadParams _params;
-  final List<String> _roles = ['Admin', 'Manager', 'Employee', 'Staff'];
-  final List<String> _statuses = ['Active', 'Pending', 'Blocked'];
-
-  @override
-  void initState() {
-    super.initState();
-    _params = widget.initialParams;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Advanced Search'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButtonFormField<String>(
-              value: _params.role,
-              decoration: const InputDecoration(labelText: 'Role'),
-              items: _roles.map((role) {
-                return DropdownMenuItem(
-                  value: role,
-                  child: Text(role),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _params = _params.copyWith(role: value);
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _params.status,
-              decoration: const InputDecoration(labelText: 'Status'),
-              items: _statuses.map((status) {
-                return DropdownMenuItem(
-                  value: status.toLowerCase(),
-                  child: Text(status),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  _params = _params.copyWith(status: value);
-                });
-              },
-            ),
-            const SizedBox(height: 16),
-            SwitchListTile(
-              title: const Text('Email Verified'),
-              value: _params.isEmailVerified ?? false,
-              onChanged: (value) {
-                setState(() {
-                  _params = _params.copyWith(isEmailVerified: value);
-                });
-              },
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: () {
-            widget.onApply(_params);
-            Navigator.pop(context);
-          },
-          child: const Text('Apply'),
-        ),
       ],
     );
   }

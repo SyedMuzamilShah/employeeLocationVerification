@@ -4,7 +4,6 @@ import 'package:my_desktop_app/core/provider/main_content_provider.dart';
 import 'package:my_desktop_app/core/provider/route_provider.dart';
 import 'package:my_desktop_app/core/widgets/loading_widget.dart';
 import 'package:my_desktop_app/core/widgets/route_display_widget.dart';
-import 'package:my_desktop_app/features/attandence/presentation/views/attendence_view.dart';
 import 'package:my_desktop_app/features/dashboard/presentation/providers/view_provider.dart';
 import 'package:my_desktop_app/features/dashboard/presentation/widgets/sidebar_widget.dart';
 import 'package:my_desktop_app/features/dashboard/presentation/widgets/top_bar_widget.dart';
@@ -33,12 +32,13 @@ class MyDashBoradView extends ConsumerWidget {
             ),
         error: (error, stack){
           return Center(
-              child: Text(error.toString()),
+              child: Text("Error Main View : ${error.toString()}"),
             );
         },
         data: (data) {
           if (data) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
+              
               ref.read(routeDisplayProvider.notifier).state =
                   RouteDisplayItem(route: OrganizationRoute());
             });
@@ -91,19 +91,19 @@ class _MyDashBoradState extends ConsumerState<MyDashBorad> {
             RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Employee'));
         mainContentWidget.value = MyEmployeeView();
         break;
-      case 2:
-        breadcrumbNotifier.state =
-            RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Attendance'));
-        mainContentWidget.value = MyAttendenceView();
+      // case 2:
+      //   breadcrumbNotifier.state =
+      //       RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Attendance'));
+      //   mainContentWidget.value = MyAttendenceView();
 
-        break;
-      case 3:
+      //   break;
+      case 2:
         breadcrumbNotifier.state =
             RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Tasks'));
         mainContentWidget.value = MyTaskView();
 
         break;
-      case 4:
+      case 3:
         breadcrumbNotifier.state =
             RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Settings'));
         mainContentWidget.value = MySettingView();
@@ -150,7 +150,7 @@ class _MyDashBoradState extends ConsumerState<MyDashBorad> {
                             top: Radius.circular(state.borderRadius),
                           ),
                         ),
-                        child: MyTopBarWidget(),
+                        child: MyTopBarWidget(sidebarXController: sideBarController,),
                       );
                     },
                   ),

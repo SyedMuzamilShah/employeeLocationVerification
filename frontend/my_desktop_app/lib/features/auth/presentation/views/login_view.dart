@@ -40,6 +40,12 @@ class _LoginViewState extends ConsumerState<LoginView> {
     });
     final _formKey = GlobalKey<FormState>();
     return Scaffold(
+      appBar: AppBar(
+        title: const Center(child: Text("Login")),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Center(
@@ -70,28 +76,49 @@ class _LoginViewState extends ConsumerState<LoginView> {
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  'Login an Account',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleLarge
-                                      ?.copyWith(fontSize: isMobile ? 18 : 24),
+                                // Text(
+                                //   'Login an Account',
+                                //   style: Theme.of(context)
+                                //       .textTheme
+                                //       .titleLarge
+                                //       ?.copyWith(fontSize: isMobile ? 18 : 24),
+                                // ),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(50),
+                                  child: SizedBox(
+                                    height: 80,
+                                    child: Image.asset(
+                                      'assets/app_icon.png',
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return CircleAvatar(
+                                          child: Icon(Icons.person),
+                                        );
+                                      },
+                                      fit: BoxFit.fill,
+                                    ),
+                                  ),
                                 ),
                                 if (state.isLoading) const MyLoadingWidget(),
                                 if (state.errorMessage != null)
                                   Container(
                                     width: double.infinity,
                                     padding: const EdgeInsets.all(10),
-                                    margin: const EdgeInsets.symmetric(vertical: 10),
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 10),
                                     decoration: BoxDecoration(
-                                      color: Theme.of(context).colorScheme.error,
+                                      color:
+                                          Theme.of(context).colorScheme.error,
                                       borderRadius: BorderRadius.circular(5),
                                     ),
                                     child: Center(
                                       child: Text(
                                         state.errorMessage!,
                                         style: TextStyle(
-                                            color: Theme.of(context).colorScheme.onError, fontSize: 14),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onError,
+                                            fontSize: 14),
                                       ),
                                     ),
                                   ),
@@ -118,13 +145,12 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                       );
 
                                       bool isLogin = await login.login(pramas);
-                                      
+
                                       if (isLogin && context.mounted) {
                                         Navigator.popAndPushNamed(
                                             context, AppRoutes.dashborad);
                                       }
                                     }
-
                                   },
                                 ),
                                 SizedBox(height: 16),

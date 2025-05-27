@@ -45,26 +45,13 @@ class ApiServices {
     required String endPoint,
     Map<String, dynamic>? body,
     Map<String, dynamic>? queryParameters,
-    bool isFormData = false,
   }) async {
-    dynamic data = body;
 
-    if (isFormData && body != null) {
-      data = FormData.fromMap(body);
-    }
-
-    print(body);
-    print(endPoint);
     return await _requestHandler(
       () => _dio.post(
         endPoint,
-        data: data,
+        data: body,
         queryParameters: queryParameters,
-        
-        options: Options(
-          contentType: isFormData ? 'multipart/form-data' : 'application/json',
-        ),
-
       ),
     );
   }
@@ -106,7 +93,7 @@ class ApiServices {
     Map<String, dynamic>? queryParameters,
   }) async {
     return await _requestHandler(() =>
-        _dio.patch(endPoint, data: body, queryParameters: queryParameters));
+        _dio.patch(endPoint, data: body, queryParameters: queryParameters, options: Options(receiveTimeout: Duration(seconds: 20))));
   }
 }
 
@@ -122,6 +109,7 @@ Future<Response<dynamic>> _requestHandler(
     // print("Api_services.dart: success response : ${response.data}");
     return response;
   } on DioException catch (e) {
+    print(e.error);
     throw ApiException.fromDioError(e);
   } catch (e) {
     throw ApiException("Unexpected error: $e");

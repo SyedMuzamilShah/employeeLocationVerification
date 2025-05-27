@@ -73,38 +73,51 @@ class EmployeeUpdateParams extends Equatable {
   final File? image;
   final EmployeeStatus? status;
 
-  const EmployeeUpdateParams({
-    required this.id,
-    this.userName,
-    this.name,
-    this.email,
-    this.phoneNumber,
-    this.role,
-    this.image,
-    this.status
-  });
+  const EmployeeUpdateParams(
+      {required this.id,
+      this.userName,
+      this.name,
+      this.email,
+      this.phoneNumber,
+      this.role,
+      this.image,
+      this.status});
 
   @override
-  List<Object?> get props => [
-        id,
-        userName,
-        name,
-        email,
-        phoneNumber,
-        role,
-        image,
-        status
-      ];
+  List<Object?> get props =>
+      [id, userName, name, email, phoneNumber, role, image, status];
 
   Map<String, dynamic> toJson() {
-    final map = <String, dynamic>{'id': id};
+    final map = <String, dynamic>{'employeeId': id};
     if (userName != null) map['userName'] = userName;
     if (name != null) map['name'] = name;
     if (email != null) map['email'] = email;
     if (phoneNumber != null) map['phoneNumber'] = phoneNumber;
-    if (role != null) map['role'] = role;
-    if (status != null) map['status'] = status;
+    if (role != null) map['role'] = role!.name;
+    if (status != null) map['status'] = status!.name;
     return map;
+  }
+
+  EmployeeUpdateParams copyWith({
+    String? id,
+    String? userName,
+    String? name,
+    String? email,
+    String? phoneNumber,
+    EmployeeRole? role,
+    File? image,
+    EmployeeStatus? status,
+  }) {
+    return EmployeeUpdateParams(
+      id: id ?? this.id,
+      userName: userName ?? this.userName,
+      name: name ?? this.name,
+      email: email ?? this.email,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      role: role ?? this.role,
+      image: image ?? this.image,
+      status: status ?? this.status,
+    );
   }
 
   Future<FormData> toFormData() async {
@@ -123,14 +136,14 @@ class EmployeeUpdateParams extends Equatable {
 }
 
 class EmployeeDeleteParams extends Equatable {
-  final String id;
+  final String employeeId;
 
-  const EmployeeDeleteParams({required this.id});
+  const EmployeeDeleteParams({required this.employeeId});
 
   @override
-  List<Object?> get props => [id];
+  List<Object?> get props => [employeeId];
 
-  Map<String, dynamic> toJson() => {'id': id};
+  Map<String, dynamic> toJson() => {'employeeId': employeeId};
 }
 
 class EmployeeReadParams extends Equatable {
@@ -224,3 +237,14 @@ class EmployeeStatusChangeParams {
       };
 }
 
+class EmployeeImageAllowParams {
+  final String employeeId;
+
+  const EmployeeImageAllowParams({
+    required this.employeeId,
+  });
+
+  Map<String, dynamic> toJson() => {
+        'employeeId': employeeId,
+      };
+}

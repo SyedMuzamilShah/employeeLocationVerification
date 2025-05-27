@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:my_desktop_app/features/task/domain/entities/task_entities.dart';
 import 'package:my_desktop_app/features/task/presentation/widgets/location_indicator_widget.dart';
 import 'package:my_desktop_app/features/task/presentation/widgets/status_chip_widget.dart';
-import 'package:my_desktop_app/features/task/presentation/widgets/task_model.dart';
-import 'package:my_desktop_app/features/task/presentation/widgets/user_avatar_widget.dart';
 
 class TaskCard extends StatelessWidget {
   final TaskEntities taskModel;
@@ -108,11 +106,11 @@ class TaskCard extends StatelessWidget {
     );
   }
 
-  List<Widget> _buildAssigneeAvatars() {
-    return [
-      UserAvatar(user: AppUser(id: '1', name: 'John', email: 'john@example.com')),
-      const SizedBox(width: 4),
-      UserAvatar(user: AppUser(id: '2', name: 'Alice', email: 'alice@example.com')),
-    ];
-  }
+  // List<Widget> _buildAssigneeAvatars() {
+  //   return [
+  //     UserAvatar(user: AppUser(id: '1', name: 'John', email: 'john@example.com')),
+  //     const SizedBox(width: 4),
+  //     UserAvatar(user: AppUser(id: '2', name: 'Alice', email: 'alice@example.com')),
+  //   ];
+  // }
 }

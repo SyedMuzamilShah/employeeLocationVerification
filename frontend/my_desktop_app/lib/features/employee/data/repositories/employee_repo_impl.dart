@@ -53,15 +53,41 @@ class EmployeeRepoImpl
 
   @override
   Future<Either<Failure, EmployeeEntities>> updateEmployee(
-      EmployeeUpdateParams prams) {
-    // TODO: implement updateEmployee
-    throw UnimplementedError();
+      EmployeeUpdateParams prams) async {
+    try {
+      final response = await dataSources.wholeDataUpdate(prams.toJson());
+      return Right(response);
+    } catch (err) {
+      if (err is ValidationException) {
+        return Left(ValidationFailure(errors: err.errors, msg: err.message));
+      } else if (err is ApiException) {
+        return Left(Failure(message: err.message));
+      } else if (err is NetworkException) {
+        return Left(Failure(message: err.message));
+      } else if (err is ServerException) {
+        return Left(Failure(message: err.message));
+      }
+      return Left(Failure(message: err.toString()));
+    }
   }
 
   @override
-  Future<Either<Failure, bool>> deleteEmployee(EmployeeDeleteParams prams) {
-    // TODO: implement deleteEmployee
-    throw UnimplementedError();
+  Future<Either<Failure, bool>> deleteEmployee(EmployeeDeleteParams prams) async {
+    try {
+      final response = await dataSources.deleteEmployee(prams.toJson());
+      return Right(response);
+    } catch (err) {
+      if (err is ValidationException) {
+        return Left(ValidationFailure(errors: err.errors, msg: err.message));
+      } else if (err is ApiException) {
+        return Left(Failure(message: err.message));
+      } else if (err is NetworkException) {
+        return Left(Failure(message: err.message));
+      } else if (err is ServerException) {
+        return Left(Failure(message: err.message));
+      }
+      return Left(Failure(message: err.toString()));
+    }
   }
 
   @override
@@ -69,6 +95,44 @@ class EmployeeRepoImpl
       EmployeeStatusChangeParams prams) async {
     try {
       final response = await dataSources.employeeStatusChange(prams.toJson());
+      return Right(response);
+    } catch (err) {
+      if (err is ValidationException) {
+        return Left(ValidationFailure(errors: err.errors, msg: err.message));
+      } else if (err is ApiException) {
+        return Left(Failure(message: err.message));
+      } else if (err is NetworkException) {
+        return Left(Failure(message: err.message));
+      } else if (err is ServerException) {
+        return Left(Failure(message: err.message));
+      }
+      return Left(Failure(message: err.toString()));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, bool>> employeeImageAllowToProcessForToken(EmployeeImageAllowParams prams) async {
+    try {
+      final response = await dataSources.allowPictureForProcessing(prams.toJson());
+      return Right(response);
+    } catch (err) {
+      if (err is ValidationException) {
+        return Left(ValidationFailure(errors: err.errors, msg: err.message));
+      } else if (err is ApiException) {
+        return Left(Failure(message: err.message));
+      } else if (err is NetworkException) {
+        return Left(Failure(message: err.message));
+      } else if (err is ServerException) {
+        return Left(Failure(message: err.message));
+      }
+      return Left(Failure(message: err.toString()));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, bool>> employeeImageRejectToProcessForToken(EmployeeImageAllowParams prams) async {
+    try {
+      final response = await dataSources.rejectPictureForProcessing(prams.toJson());
       return Right(response);
     } catch (err) {
       if (err is ValidationException) {

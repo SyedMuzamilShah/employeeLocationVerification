@@ -1,53 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:my_desktop_app/core/widgets/loading_widget.dart';
+import 'package:my_desktop_app/core/widgets/my_button.dart';
 import 'package:my_desktop_app/core/widgets/my_dialog_box.dart';
 import 'package:my_desktop_app/core/widgets/my_text_field.dart';
 import 'package:my_desktop_app/features/organization/presentation/providers/organization_provider.dart';
-import 'package:my_desktop_app/features/task/data/models/request/task_prams.dart';
+import 'package:my_desktop_app/features/task/presentation/provider/task_create_provider.dart';
 import 'package:my_desktop_app/features/task/presentation/provider/task_provider.dart';
+import 'package:my_desktop_app/features/task/presentation/widgets/location_mark_widget.dart';
 import 'package:my_desktop_app/features/task/presentation/widgets/search_employee_assign_widget.dart';
-import 'package:my_desktop_app/features/task/presentation/widgets/task_model.dart';
 
-class TaskForm extends StatefulWidget {
-  final TaskLocation? initialLocation;
-  const TaskForm({
-    super.key,
-    this.initialLocation,
-  });
+class TaskForm extends ConsumerStatefulWidget {
+  const TaskForm({super.key});
 
   @override
-  State<TaskForm> createState() => _TaskFormState();
+  ConsumerState<TaskForm> createState() => _TaskFormState();
 }
 
-class _TaskFormState extends State<TaskForm> {
+class _TaskFormState extends ConsumerState<TaskForm> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _addressController = TextEditingController();
+  final _radiusController = TextEditingController();
 
-  DateTime _dueDate = DateTime.now().add(const Duration(days: 1));
-  // TaskPriority _priority = TaskPriority.medium;
-  // String? _assigneeId;
-  TaskLocation? _location;
-
-  @override
-  void initState() {
-    super.initState();
-    _location = widget.initialLocation;
-    if (_location?.address != null) {
-      _addressController.text = _location!.address!;
-    }
-  }
+  final DateTime _dueDate = DateTime.now().add(const Duration(minutes: 30));
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _addressController.dispose();
+    _radiusController.dispose();
     super.dispose();
   }
 
@@ -55,72 +38,84 @@ class _TaskFormState extends State<TaskForm> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final org = ref.watch(organizationProvider).selectedOrganization;
+    
+    final taskParamsNotifier = ref.watch(taskCreateParamsProvider.notifier);
+    final taskState = ref.watch(taskProvider);
+    final taskNotifier = ref.read(taskProvider.notifier);
+    final fieldErrors = {
+      for (var e in taskState.errorList ?? []) e['path']: e['msg']
+    };
+
+    if (org == null) {
+      return const Center(child: Text("Please select an organization first"));
+    }
 
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
-        child: Consumer(builder: (context, ref, _) {
-          final orgState = ref.watch(organizationProvider).selectedOrganization;
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          spacing: 10,
+          children: [
+            _buildHeader(theme, colorScheme),
+            if (taskState.isLoading) const MyLoadingWidget(),
+            if (taskState.errorMessage != null)
+              _buildErrorBox(taskState.errorMessage!, colorScheme),
+            MyCustomTextField(
+              controller: _titleController,
+              labelText: "Title",
+              hintText: "Enter task title",
+              errorText: fieldErrors['title'],
+              prefixIcon: Icons.title,
+              onChanged: (value) {
+                taskParamsNotifier.title(value);
+              },
+            ),
+            MyCustomTextField(
+              controller: _descriptionController,
+              labelText: "Description",
+              hintText: "Enter task description",
+              errorText: fieldErrors['description'],
+              prefixIcon: Icons.description,
+              onChanged: (value) {
+                taskParamsNotifier.description(value);
+              },
+              maxLines: 4,
+            ),
+            MyCustomTextField(
+              controller: _radiusController,
+              labelText: "Radius",
+              keyboardType: TextInputType.number,
+              hintText: "Enter task Radius",
+              errorText: fieldErrors['radius'],
+              prefixIcon: Icons.circle,
+              onChanged: (value) {
+                if (value.isEmpty) return;
 
-          final taskState = ref.watch(taskProvider);
-          final taskNotifier = ref.watch(taskProvider.notifier);
+                taskParamsNotifier.radius(double.tryParse(value)!);
+              },
+            ),
+            _buildDatePicker(taskParamsNotifier),
+            _buildLocationSection(taskParamsNotifier),
+            MyCustomButton(
+              btnText: 'Create Task',
+              onClick: () => _submitForm(taskNotifier, taskState, org.id),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-          final fieldErrors = {
-            for (var e in taskState.errorList ?? []) e['path']: e['msg']
-          };
-
-          if (orgState == null) {
-            return Center(
-              child: Text("Please selete organization first"),
-            );
-          }
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Center(
-                child: Text(
-                  'Add New Employee',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              if (taskState.isLoading) const Center(child: MyLoadingWidget()),
-              if (taskState.errorMessage != null)
-                _buildErrorBox(taskState.errorMessage!, colorScheme),
-              MyCustomTextField(
-                controller: _titleController,
-                labelText: "Title",
-                hintText: "Enter your title",
-                errorText: fieldErrors['title'],
-                prefixIcon: Icons.title,
-                validatorFuncation: (value) =>
-                    (value?.isEmpty ?? true) ? 'Required' : null,
-              ),
-              MyCustomTextField(
-                controller: _descriptionController,
-                labelText: "Description",
-                hintText: "Enter your description",
-                errorText: fieldErrors['description'],
-                prefixIcon: Icons.description,
-                maxLines: 4,
-                validatorFuncation: (value) =>
-                    (value?.isEmpty ?? true) ? 'Required' : null,
-              ),
-              _buildDatePicker(),
-              _buildLocationSection(context),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () =>
-                    _submitForm(taskNotifier, taskState, orgState.id, ref),
-                child: const Text('Create Task'),
-              ),
-            ],
-          );
-        }),
+  Widget _buildHeader(ThemeData theme, ColorScheme colorScheme) {
+    return Center(
+      child: Text(
+        'Add New Task',
+        style: theme.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: colorScheme.onPrimary,
+        ),
       ),
     );
   }
@@ -147,59 +142,27 @@ class _TaskFormState extends State<TaskForm> {
     );
   }
 
-  void _submitForm(TaskNotifier notifier, TaskState state,
-      String organizationId, WidgetRef ref) async {
-    if (_formKey.currentState!.validate()) {
-      final taskParams = TaskCreateParams(
-        title: _titleController.text,
-        organizationId: organizationId,
-        description: _descriptionController.text,
-        dueDate: _dueDate,
-        location: LocationModel(
-          latitude: _location!.latitude,
-          longitude: _location!.longitude,
-        ),
-      );
-
-      bool response = await notifier.create(model: taskParams);
-
-      if (response && context.mounted) {
-        Navigator.pop(context);
-
-        // ✅ Watch the latest taskProvider value after state is updated
-        final currentTask = ref.read(taskProvider).currentTask;
-
-        if (currentTask != null) {
-          showMyDialog(
-              context, SearchEmployeeAssignWidget(currentTask: currentTask));
-        } else {
-          showMyDialog(
-              context, const Center(child: Text("Something went wrong")));
-        }
-      }
-    }
-  }
-
-  Widget _buildDatePicker() {
+  Widget _buildDatePicker(TaskCreateParamsNotifier taskParamsNotifier) {
     return ListTile(
       title: const Text('Due Date'),
-      subtitle: Text(DateFormat('MMM dd, yyyy').format(_dueDate)),
+      subtitle: Text(DateFormat('MMM dd, yyyy – hh:mm a').format(_dueDate)),
       trailing: const Icon(Icons.calendar_today),
       onTap: () async {
-        final pickedDate = await showDatePicker(
+        final picked = await showDatePicker(
           context: context,
           initialDate: _dueDate,
-          firstDate: DateTime.now(),
+          firstDate: DateTime.now().add(const Duration(minutes: 30)),
           lastDate: DateTime.now().add(const Duration(days: 365)),
         );
-        if (pickedDate != null) {
-          setState(() => _dueDate = pickedDate);
+        if (picked != null) {
+          taskParamsNotifier.dueDate(picked);
         }
       },
     );
   }
 
-  Widget _buildLocationSection(BuildContext context) {
+  Widget _buildLocationSection(TaskCreateParamsNotifier taskParamsNotifier) {
+    final state = ref.watch(taskCreateParamsProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -207,38 +170,25 @@ class _TaskFormState extends State<TaskForm> {
         const SizedBox(height: 8),
         Row(
           children: [
-            Expanded(
-              child: MyCustomTextField(
-                controller: _addressController,
-                labelText: 'Address',
-                hintText: 'Enter address or tap map',
-                onChanged: (value) {
-                  if (_location != null) {
-                    _location = TaskLocation(
-                      latitude: _location!.latitude,
-                      longitude: _location!.longitude,
-                      address: value,
-                    );
-                  }
-                },
-              ),
-            ),
             IconButton(
               icon: const Icon(Icons.map),
-              onPressed: () => _showMapPicker(context),
+              onPressed: () => showMyDialog(context, AddressSearchView(taskParamsNotifier: taskParamsNotifier,), height: 490),
             ),
           ],
         ),
-        if (_location != null)
+        if (state.location != null)
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: Row(
+            child: Wrap(
               children: [
                 const Icon(Icons.location_pin, size: 16, color: Colors.red),
                 const SizedBox(width: 4),
+                if (state.location!.address != null)
+                Text(state.location!.address!),
+                
                 Text(
-                  'Lat: ${_location!.latitude.toStringAsFixed(4)}, '
-                  'Lng: ${_location!.longitude.toStringAsFixed(4)}',
+                  'Lat: ${state.location!.latitude.toStringAsFixed(4)}, '
+                  'Lng: ${state.location!.longitude.toStringAsFixed(4)}',
                   style: const TextStyle(fontSize: 12),
                 ),
               ],
@@ -248,71 +198,28 @@ class _TaskFormState extends State<TaskForm> {
     );
   }
 
-  void _showMapPicker(BuildContext context) {
-    LatLng? selectedLocation = _location?.toLatLng();
+  void _submitForm(TaskNotifier notifier, TaskState state, String orgId) async {
+    final paramsState = ref.read(taskCreateParamsProvider);
+    if (!_formKey.currentState!.validate() || paramsState.location == null) {
+      return;
+    }
 
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Select Location'),
-          content: SizedBox(
-            width: double.maxFinite,
-            height: 400,
-            child: FlutterMap(
-              options: MapOptions(
-                initialCenter:
-                    selectedLocation ?? const LatLng(30.1834, 66.9987),
-                initialZoom: 12.0,
-                onTap: (_, latLng) {
-                  selectedLocation = latLng;
-                },
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.example.task_manager',
-                ),
-                if (selectedLocation != null)
-                  MarkerLayer(
-                    markers: [
-                      Marker(
-                        point: selectedLocation!,
-                        width: 40,
-                        height: 40,
-                        child: const Icon(Icons.location_pin,
-                            color: Colors.red, size: 40),
-                      ),
-                    ],
-                  ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                if (selectedLocation != null) {
-                  setState(() {
-                    _location = TaskLocation(
-                      latitude: selectedLocation!.latitude,
-                      longitude: selectedLocation!.longitude,
-                      address: _addressController.text.isNotEmpty
-                          ? _addressController.text
-                          : null,
-                    );
-                  });
-                }
-                Navigator.pop(context);
-              },
-              child: const Text('Select'),
-            ),
-          ],
-        );
-      },
-    );
+    final success = await notifier.create(model: paramsState);
+
+    if (success && mounted) {
+      Navigator.pop(context); // Pop the task created dialog
+
+      // That will load the employee list and we can assign the created tast
+      ref.invalidate(loadTaskProvider);
+      final task = ref.read(taskProvider).currentTask;
+
+      // Show the employee assign dialog
+      showMyDialog(
+        context,
+        task != null
+            ? SearchEmployeeAssignWidget(currentTask: task)
+            : const Center(child: Text("Something went wrong")),
+      );
+    }
   }
 }

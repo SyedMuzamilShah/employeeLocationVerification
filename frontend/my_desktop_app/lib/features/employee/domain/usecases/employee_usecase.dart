@@ -31,6 +31,17 @@ class EmployeeUseCase {
   Future<Either<Failure, EmployeeEntities>> employeeStatusChange(EmployeeStatusChangeParams prams) async {
     return await repoManagementImpl.employeeStatusChange(prams);
   }
+
+
+  Future<Either<Failure, bool>> employeeImageAllowForProcessing(EmployeeImageAllowParams prams) async {
+    return await repoManagementImpl.employeeImageAllowToProcessForToken(prams);
+  }
+
+  Future<Either<Failure, bool>> employeeImageRejectForProcessing(EmployeeImageAllowParams prams) async {
+    return await repoManagementImpl.employeeImageRejectToProcessForToken(prams);
+  }
+
+
 }
 
 

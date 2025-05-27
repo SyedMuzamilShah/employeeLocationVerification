@@ -14,4 +14,6 @@ abstract class EmployeeRepository {
 
 abstract class EmployeeManagementRepository {
   Future<Either<Failure, EmployeeEntities>> employeeStatusChange(EmployeeStatusChangeParams prams);
+  Future<Either<Failure, bool>> employeeImageAllowToProcessForToken(EmployeeImageAllowParams prams);
+  Future<Either<Failure, bool>> employeeImageRejectToProcessForToken(EmployeeImageAllowParams prams);
 }

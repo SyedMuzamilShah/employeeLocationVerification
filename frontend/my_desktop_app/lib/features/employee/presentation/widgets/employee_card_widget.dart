@@ -41,8 +41,9 @@ class EmployeeCard extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                if(employee.name != null)
                 Text(
-                  employee.name,
+                  employee.name!,
                   style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 EmployeeStatusBadge(status: employee.status.name),
@@ -69,12 +70,12 @@ class EmployeeCard extends ConsumerWidget {
             Wrap(
               spacing: 12,
               children: [
-                Text(
-                  employee.organizationId,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
-                  ),
-                ),
+                // Text(
+                //   employee.organizationId,
+                //   style: theme.textTheme.bodySmall?.copyWith(
+                //     color: theme.textTheme.bodySmall?.color?.withOpacity(0.6),
+                //   ),
+                // ),
                 if (employee.role != null)
                   Text(
                     employee.role!,

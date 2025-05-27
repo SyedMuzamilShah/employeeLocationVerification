@@ -21,7 +21,7 @@ class ApiException implements Exception {
       case DioExceptionType.badResponse:
         return _handleBadResponse(error);
       default:
-        return ApiException("Something went wrong.");
+        return ApiException(error.error.toString() ?? "Something went wrong.");
     }
   }
 

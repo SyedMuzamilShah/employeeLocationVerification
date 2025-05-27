@@ -179,6 +179,7 @@ class OrganizationAddWidgetState extends State<OrganizationAddWidget> {
                                   bool isCreate = await notifier.create(model: model);
                                   if (isCreate){
                                     if (context.mounted){
+                                      ref.invalidate(organizationsLoadProvider);
                                       Navigator.pop(context);
                                     }
                                   }

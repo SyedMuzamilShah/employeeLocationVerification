@@ -71,4 +71,9 @@ class OrganizationRepoImpl extends OrganizationRepo {
   Future<void> organizationSaved(Map<String, dynamic> organization) async {
     await _localSources.cacheOrganization(organization);
   }
+  
+  @override
+  Future<void> clearOrganization() async {
+    await _localSources.clearOrganization();
+  }
 }

@@ -2,16 +2,9 @@ import 'package:my_desktop_app/features/task/data/models/request/task_prams.dart
 
 enum TaskStatus {
   all,
-  // created,
-  // assigned,
-  // completed,
-  // verified
-  pending,
   created,
   assigned,
-  inProgress,
   completed,
-  cancelled,
 }
 
 
@@ -27,6 +20,7 @@ class TaskEntities {
   final DateTime createdAt;
   final DateTime updatedAt;
   final LocationModel? location;
+  final double? aroundDistanceMeter;
 
   TaskEntities({
     required this.id,
@@ -39,5 +33,6 @@ class TaskEntities {
     required this.createdAt,
     required this.updatedAt,
     this.location,
+    this.aroundDistanceMeter
   });
 }

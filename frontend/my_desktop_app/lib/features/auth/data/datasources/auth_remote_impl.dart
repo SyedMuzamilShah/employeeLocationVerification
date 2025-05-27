@@ -42,7 +42,7 @@ class AuthRemoteDataSourcesImpl extends AuthRemoteDataSources {
     try {
       var response = await _apiServices.postRequest(
         endPoint: ServerUrl.userRegisterRoute, body: prams);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         return Right(response.data);
       } else {
         return Left(

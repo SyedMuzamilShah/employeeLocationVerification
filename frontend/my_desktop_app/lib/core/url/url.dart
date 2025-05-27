@@ -14,12 +14,18 @@ class ServerUrl {
   static const String userForgotRoute = '';
   static const String userChangePasswordRoute = '';
   static const String userGetProfileRoute = '';
+
+
+  static const String getAddressSuggestion = '$baseUrl/admin/address/get-suggestions';
  
   
   static const String employeeCreateRoute = '$baseUrl/admin/employee/create';
+  static const String employeeDeleteRoute = '$baseUrl/admin/employee/delete';
+  static const String employeeWholeDataUpdateRoute = '$baseUrl/admin/employee/update-data';
   static const String employeeGetRoute = '$baseUrl/admin/employee/get';
   static const String employeeStatusChangeRoute = '$baseUrl/admin/employee/status-change';
   static const String employeePictureAllowForProcessing = '$baseUrl/admin/employee/allow-picture';
+  static const String employeePictureRejectForProcessing = '$baseUrl/admin/employee/reject-picture';
 
   static const String employeeLoginRoute = '$baseUrl/admin/auth/login';
   static const String employeeLogoutRoute = '$baseUrl/admin/auth/logout';
@@ -34,6 +40,7 @@ class ServerUrl {
   static const String userDeleteOrganization = '$baseUrl/admin/organization/delete';
 
   static const String taskRead = '$baseUrl/admin/task/get';
+  static const String taskDetailGet = '$baseUrl/admin/task/assigned-detail';
   static const String taskAssign = '$baseUrl/admin/task/assign';
   static const String taskStatusChange = '$baseUrl/admin/task/status-change';
   static const String taskVerified = '$baseUrl/admin/task/verified';

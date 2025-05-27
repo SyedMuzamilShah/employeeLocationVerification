@@ -5,19 +5,28 @@ import 'package:my_desktop_app/core/widgets/my_button.dart';
 class ImagePreview extends ConsumerWidget {
   final String? image;
   final bool imageAcceptedForToken;
-  const ImagePreview({super.key, this.image, required this.imageAcceptedForToken});
+  final Function()? onBtnClick;
+  final Function ()? onBtnReject;
+  const ImagePreview(
+      {super.key,
+      this.image,
+      required this.imageAcceptedForToken,
+      this.onBtnClick,
+      this.onBtnReject});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        const Text("Image Preview:", style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text("Image Preview:",
+            style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         if (image != null)
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
-            child: Image.network(image!, height: 250, width: 250, fit: BoxFit.cover),
+            child: Image.network(image!,
+                height: 250, width: 250, fit: BoxFit.cover),
           )
         else
           Container(
@@ -32,8 +41,22 @@ class ImagePreview extends ConsumerWidget {
           ),
         const SizedBox(height: 8),
         if (!imageAcceptedForToken)
-        if (image != null)
-        MyCustomButton(btnText: 'Accept image for token', onClick: (){})
+          if (image != null)
+          Column(
+            spacing: 10,
+            children: [
+            MyCustomButton(
+              btnText: 'Accept image for token',
+              onClick: onBtnClick
+            ),
+            MyCustomButton(
+              btnText: 'Reject Image for Token',
+              onClick: onBtnReject,
+              color: Colors.red,
+            ),
+
+            ],
+          )
         // Row(
         //   children: [
         //     Checkbox(

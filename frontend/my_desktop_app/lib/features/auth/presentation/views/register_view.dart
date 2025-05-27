@@ -45,27 +45,44 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text("Register")),
+        title: const Center(child: Text("Create Account")),
         centerTitle: true,
         automaticallyImplyLeading: false,
+        backgroundColor: Colors.transparent,
       ),
       body: Center(
         child: Container(
           width: isMobile ? double.infinity : 600, // Responsive width
           padding: EdgeInsets.all(16),
           child: Card(
-            elevation: 4,
+            elevation: 2,
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(
-                    'Create an Account',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                  // Text(
+                  //   'Create an Account',
+                  //   style: TextStyle(
+                  //     fontSize: 24,
+                  //     fontWeight: FontWeight.bold,
+                  //   ),
+                  // ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(50),
+                    child: SizedBox(
+                      height: 80,
+                      child: Image.asset(
+                        'assets/app_icon.png',
+                        errorBuilder: (context, error, stackTrace) {
+                          return CircleAvatar(
+                            child: Icon(Icons.person),
+                          );
+                        },
+                        fit: BoxFit.fill,
+                      ),
                     ),
                   ),
                   if (state.isLoading) const MyLoadingWidget(),
@@ -88,7 +105,7 @@ class _RegisterViewState extends ConsumerState<RegisterView> {
                     ),
                   MyCustomTextField(
                     controller: userNameController,
-                    hintText: "Name",
+                    hintText: "User name",
                     errorText: fieldErrors[
                         'userName'], // Show validation error if exists
                   ),

@@ -36,6 +36,9 @@ abstract class TaskDataSources {
       Map<String, dynamic> params);
   Future<Either<Failure, Map<String, dynamic>>> taskRead(
       [Map<String, dynamic>? params]);
+  
+  Future<Either<Failure, Map<String, dynamic>>> taskDetailGet(
+    Map<String, dynamic> params);
 }
 
 class TaskManagamentDataSourcesImpl extends TaskManagamentDataSources {
@@ -90,8 +93,8 @@ class TaskManagamentDataSourcesImpl extends TaskManagamentDataSources {
   Future<Either<Failure, Map<String, dynamic>>> taskVerified(
       Map<String, dynamic> params) async {
     try {
-      final response = await _api.getRequest(
-          endPoint: ServerUrl.taskVerified, queryParameters: params);
+      final response = await _api.patchRequest(
+          endPoint: ServerUrl.taskVerified, body: params);
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Right(response.data);
       } else {
@@ -111,9 +114,9 @@ class TaskManagamentDataSourcesImpl extends TaskManagamentDataSources {
   @override
   Future<Either<Failure, Map<String, dynamic>>> taskStatusChange(Map<String, dynamic> params) async {
     try {
-      final response = await _api.getRequest(
+      final response = await _api.patchRequest(
           endPoint: ServerUrl.taskStatusChange, queryParameters: params);
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
         return Right(response.data);
       } else {
         return Left(
@@ -175,6 +178,7 @@ class TaskDataSourcesImpl implements TaskDataSources {
       }
       return Left(Failure(message: err.message));
     } catch (err) {
+      print(err);
       return Left(Failure(message: err.toString()));
     }
   }
@@ -183,7 +187,7 @@ class TaskDataSourcesImpl implements TaskDataSources {
   Future<Either<Failure, Map<String, dynamic>>> taskUpdate(
       Map<String, dynamic> params) async {
     try {
-      final response = await _api.putRequest(
+      final response = await _api.patchRequest(
         endPoint: ServerUrl.taskUpdate,
         body: params,
       );
@@ -215,6 +219,30 @@ class TaskDataSourcesImpl implements TaskDataSources {
         return Right(response.data);
       }
       if (response.statusCode == 200 || response.statusCode == 201) {
+        return Right(response.data);
+      } else {
+        return Left(
+            Failure(message: response.data?['message'] ?? 'Request failed'));
+      }
+    } on ApiException catch (err) {
+      if (err is ValidationException) {
+        return Left(ValidationFailure(errors: err.errors, msg: err.message));
+      }
+      return Left(Failure(message: err.message));
+    } catch (err) {
+      return Left(Failure(message: err.toString()));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, Map<String, dynamic>>> taskDetailGet(Map<String, dynamic> params) async {
+    try {
+      final response = await _api.getRequest(
+        endPoint: ServerUrl.taskDetailGet,
+        queryParameters: params,
+      );
+
+      if (response.statusCode == 200) {
         return Right(response.data);
       } else {
         return Left(

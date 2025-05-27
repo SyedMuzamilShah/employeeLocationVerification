@@ -3,7 +3,7 @@ import 'package:my_desktop_app/features/employee/domain/entities/employee_filter
 class EmployeeEntities {
   final String id;
   final String organizationId;
-  final String name;
+  final String? name;
   final String email;
   final String? phone;
   EmployeeStatus status;
@@ -21,7 +21,7 @@ class EmployeeEntities {
   EmployeeEntities({
     required this.id,
     required this.organizationId,
-    required this.name,
+    this.name,
     required this.email,
     this.phone,
     required this.status,

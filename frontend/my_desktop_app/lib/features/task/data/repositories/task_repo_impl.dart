@@ -2,7 +2,9 @@ import 'package:fpdart/fpdart.dart';
 import 'package:my_desktop_app/core/failure/failure.dart';
 import 'package:my_desktop_app/features/task/data/datasources/task_datasources.dart';
 import 'package:my_desktop_app/features/task/data/models/request/task_prams.dart';
+import 'package:my_desktop_app/features/task/data/models/response/task_detail_response.dart';
 import 'package:my_desktop_app/features/task/data/models/response/task_response.dart';
+import 'package:my_desktop_app/features/task/domain/entities/task_detail_entities.dart';
 import 'package:my_desktop_app/features/task/domain/entities/task_entities.dart';
 import 'package:my_desktop_app/features/task/domain/repositories/task_repo.dart';
 
@@ -57,4 +59,20 @@ class TaskRepoImpl extends TaskRepo {
       (succ) => Right(TaskResponseModel.fromJson(succ['data'])),
     );
   }
+
+  @override
+Future<Either<Failure, List<TaskAssignmentEntity>>> taskDetailGet(TaskDetailGetParams params) async {
+  final response = await _dataSources.taskDetailGet(params.toJson());
+  return response.fold(
+    (err) => Left(err),
+    (succ) {
+      List data = succ['data']['tasks'];
+      print(data);
+      return Right(
+        data.map((e) => TaskAssignmentModel.fromJson(e)).toList()
+      );
+    },
+  );
+}
+
 }

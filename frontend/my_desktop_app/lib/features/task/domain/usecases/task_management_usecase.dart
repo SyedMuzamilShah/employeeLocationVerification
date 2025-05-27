@@ -1,6 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:my_desktop_app/core/failure/failure.dart';
 import 'package:my_desktop_app/features/task/data/models/request/task_managment_parmas.dart';
+import 'package:my_desktop_app/features/task/data/models/request/task_verified_params.dart';
 import 'package:my_desktop_app/features/task/domain/entities/task_managemanat_entities.dart';
 import 'package:my_desktop_app/features/task/domain/repositories/task_repo.dart';
 
@@ -8,7 +9,7 @@ abstract class TaskManagementUsecase {
   Future<Either<Failure, TaskManagementEntities>> taskAssign(TaskAssignParams params);
   Future<Either<Failure, TaskManagementEntities>> taskDeassign(TaskDeAssignParams params);
   Future<Either<Failure, bool>> taskVerified(TaskVerifiedParams params);
-  Future<Either<Failure, TaskManagementEntities>> taskStatusChange(TaskStatusChangeParams params);
+  Future<Either<Failure, void>> taskStatusChange(TaskStatusChangeParams params);
 }
 
 class TaskManagementUsecaseImpl extends TaskManagementUsecase {
@@ -42,7 +43,7 @@ class TaskManagementUsecaseImpl extends TaskManagementUsecase {
   }
   
   @override
-  Future<Either<Failure, TaskManagementEntities>> taskStatusChange(TaskStatusChangeParams params) async  {
+  Future<Either<Failure, void>> taskStatusChange(TaskStatusChangeParams params) async  {
     final response = await _repo.taskStatusChange(params);
     return response.fold(
       (err) => Left(err),

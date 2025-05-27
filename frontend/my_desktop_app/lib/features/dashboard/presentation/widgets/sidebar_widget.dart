@@ -16,7 +16,7 @@ class ExampleSidebarX extends StatelessWidget {
     List<Map<String, dynamic>> data = [
       {'label': 'Overview', 'icon': Icons.dashboard},
       {'label': 'Employee', 'icon': Icons.people},
-      {'label': 'Attendance', 'icon': Icons.calendar_today},
+      // {'label': 'Attendance', 'icon': Icons.calendar_today},
       {'label': 'Task', 'icon': Icons.task},
       {'label': 'Settings', 'icon': Icons.settings},
     ];
@@ -29,18 +29,20 @@ class ExampleSidebarX extends StatelessWidget {
           return Padding(
             padding: EdgeInsets.symmetric(vertical: 20),
             child: ClipRRect(
-                borderRadius: BorderRadius.circular(50),
-                child: Image.network(
-                  'https://www.hubspot.com/hubfs/parts-url_1.webp',
-                  errorBuilder: (context, error, stackTrace){
+              borderRadius: BorderRadius.circular(50),
+              child: SizedBox(
+                height: 80,
+                child: Image.asset(
+                  'assets/app_icon.png',
+                  errorBuilder: (context, error, stackTrace) {
                     return CircleAvatar(
                       child: Icon(Icons.person),
                     );
                   },
-                  width: 50,
-                  height: 50,
-                  fit: BoxFit.cover,
-                )),
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
           );
         },
         items: data.mapWithIndex((element, index) {
