@@ -9,14 +9,26 @@ export const employeeCreateServices = {
     findExistingUser: async ({ userName, email }) => {
         return await employeeModel.findOne({ $or: [{ email }, { userName }] }).lean();
     },
+
+    // use for employee
+    getOrganizationMongoId: async (dataObject) => {
+        const { organizationId } = dataObject;
+        if (isValidObjectId(organizationId)) {
+            return organizationId; // Already valid
+        } else {
+            // mean the employee pass custom id
+            const org = await organizationModel.findOne({ organizationId }).select('_id');
+            return org?._id || null;
+        }
+    },
+
     finaOrganization: async ({ organizationId, adminId }) => {
         let org;
         console.log(`Testing the admin ID : ${adminId}`)
-        if (isValidObjectId(organizationId)){
-            org = await organizationModel.findOne({_id : organizationId, createdBy : adminId});
+        if (adminId){
+            org = await organizationModel.findOne({ _id: organizationId, createdBy: adminId });
         }else {
-            // org = await organizationModel.findOne({ organizationId: organizationId, createdBy : adminId });
-            org = await organizationModel.findOne({ organizationId: organizationId});
+            org = await organizationModel.findOne({ _id: organizationId});
         }
         return org
     },
@@ -29,25 +41,25 @@ export const employeeCreateServices = {
             const employee = await employeeModel.create({
                 userName,
                 imageUrl: imageUrl,
-                
-                name, email, password, biometricToken, phoneNumber, role : role.toUpperCase(), organizationId
+
+                name, email, password, biometricToken, phoneNumber, role: role?.toUpperCase(), organizationId
             });
 
             // Generate tokens
             let access;
             let refresh;
 
-            if (!adminId){
+            if (!adminId) {
                 access = employee.generateAccessToken();
                 refresh = employee.generateRefreshToken();
-                
+
                 // Save refresh token
                 employee.refreshToken = refresh;
             }
-            
+
 
             // Admin
-            if (adminId){
+            if (adminId) {
                 employee.status = EmployeeStatus.VERIFIED;
             }
 
@@ -59,7 +71,7 @@ export const employeeCreateServices = {
             // delete userResponse.password;
             // delete userResponse.__v;
             // delete userResponse.refreshToken;
-            return { user : employee, tokens: { accessToken: access, refreshToken: refresh } };
+            return { user: employee, tokens: { accessToken: access, refreshToken: refresh } };
 
         } catch (err) {
             console.error("Error in employee creation service:", err.message);
@@ -105,7 +117,7 @@ export const employeeLoginServices = async (dataObject) => {
         user.refreshToken = refresh
         await user.save();
 
-        return { userResponse : user, tokens: { accessToken: access, refreshToken: refresh } };
+        return { userResponse: user, tokens: { accessToken: access, refreshToken: refresh } };
     } catch (err) {
         // Log the error for debugging
         // console.error('Login service error:', err);
@@ -162,7 +174,7 @@ export const getEmployeeProfileService = async (userId) => {
         delete userResponse.__v;
         delete userResponse.refreshToken;
 
-        return userResponse;
+        return {user : userResponse};
     } catch (err) {
         // Log the error for debugging
         console.error('Get profile service error:', err);

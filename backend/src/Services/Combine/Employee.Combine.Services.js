@@ -108,6 +108,7 @@ export const employeeUpdateServices = async (dataObject) => {
 }
 
 export const employeeUpdateToGether = async (dataObject) => {
+    console.log(dataObject)
     const { employeeId } = dataObject
     const employee = await employeeModel.findById(employeeId);
     if (!employee) {
@@ -126,6 +127,10 @@ export const employeeUpdateToGether = async (dataObject) => {
     // Loop through allowed fields and update the employee object
     for (const key of allowedFields) {
         if (dataObject[key] !== undefined) {
+            if (key === allowedFields[2] || key === allowedFields[3]) {
+                employee[key] = dataObject[key].toUpperCase();
+                continue;
+            }
             employee[key] = dataObject[key];
         }
     }
@@ -137,13 +142,12 @@ export const employeeUpdateToGether = async (dataObject) => {
 
 export const employeeStatusChange = async (dataObject) => {
     const { adminId, employeeId, status } = dataObject;
-
     const employee = await employeeModel.findById(employeeId);
     if (!employee) {
         throw new ErrorResponse(STATUS_CODES.NOT_FOUND, 'Employee not found');
     }
 
-    const isOrg = await organizationModel.findOne({organizationId : employee.organizationId, createdBy : adminId})
+    const isOrg = await organizationModel.findOne({_id : employee.organizationId, createdBy : adminId})
 
     if (!isOrg){
         throw new ErrorResponse(STATUS_CODES.NOT_FOUND, 'Employee Is not registerd');

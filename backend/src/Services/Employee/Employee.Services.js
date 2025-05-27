@@ -1,5 +1,6 @@
+import mongoose from "mongoose";
 import { STATUS_CODES } from "../../../constant.js";
-import { employeeModel } from "../../Models/Employee.Model.js"
+import { employeeModel, EmployeeStatus } from "../../Models/Employee.Model.js"
 import { taskAssignmentModel } from "../../Models/TaskAssignment.Model.js";
 import { ErrorResponse } from "../../Utils/Error.js";
 
@@ -55,10 +56,56 @@ export const employeeImageUploadServices = async (dataObject) => {
     }
 }
 
-
 export const employeeAssignTaskReadService = async (dataObject) => {
-    const { employeeId } =  dataObject
-    const task = await taskAssignmentModel.find({employeeId : employeeId})
+  const { employeeId } = dataObject;
 
-    return {task}
-}
+  const employee = await employeeModel.findById(employeeId);
+  if (!employee) {
+    throw new ErrorResponse(404, "Employee not found");
+  }
+
+  if (employee.status === EmployeeStatus.PENDING) {
+    throw new ErrorResponse(409, "Admin Not Authenticated yet!");
+  }
+
+  const tasks = await taskAssignmentModel.aggregate([
+    {
+      $match: {
+        employeeId: new mongoose.Types.ObjectId(employeeId),
+      },
+    },
+    {
+      $lookup: {
+        from: "tasks", // name of the tasks collection
+        localField: "taskId",
+        foreignField: "_id",
+        as: "taskInfo",
+      },
+    },
+    { $unwind: "$taskInfo" },
+    {
+      $project: {
+        _id: 1,
+        employeeId: 1,
+        taskId: 1,
+        status: 1,
+        assignedAt: 1,
+        employeeLocation : 1,
+        submittedLate : 1,
+        submittedAt : 1,
+        validateMethod : 1,
+        deadline: 1,
+        faceVerification : 1,
+        pictureAllowed : 1,
+        createdAt : 1,
+        updatedAt : 1,
+        title: "$taskInfo.title",
+        description: "$taskInfo.description",
+        location: "$taskInfo.location",
+        aroundDistanceMeter : "$taskInfo.aroundDistanceMeter"
+      },
+    },
+  ]);
+  console.log(tasks)
+  return { tasks };
+};

@@ -65,18 +65,9 @@ export const adminCreateOrganization = controllerHandler(async (req, res) => {
  */
 export const adminGetAllOrganization = controllerHandler(async (req, res) => {
     const adminId = req.user._id;
-    // Validate request
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        throw new ErrorResponse(
-            STATUS_CODES.BAD_REQUEST, 
-            'Validation failed', 
-            errors.array()
-        );
-    }
 
-    const dataObject = { adminId, ...req.body, ...req.query };
-    console.log(dataObject)
+    const dataObject = { adminId, ...req.query };
+    
     try {
         const { organizations } = await getAllOrganization(dataObject);
         return res.status(STATUS_CODES.OK).json(
@@ -98,16 +89,6 @@ export const adminGetAllOrganization = controllerHandler(async (req, res) => {
  */
 export const adminDeleteOrganization = controllerHandler(async (req, res) => {
     const adminId = req.user._id;
-    
-    // Validate request
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        throw new ErrorResponse(
-            STATUS_CODES.BAD_REQUEST, 
-            'Validation failed', 
-            errors.array()
-        );
-    }
 
     const dataObject = { adminId, ...req.query };
     

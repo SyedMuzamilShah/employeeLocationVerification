@@ -6,17 +6,22 @@ import { SuccessResponse } from "../../Utils/Success.js";
 import { controllerHandler } from "../../Utils/ControllerHandler.js";
 import { deleteImage } from "../../Utils/DeleteImageFromLocalServer.js"
 import { employeeImageUploadServices } from "../../Services/Employee/Employee.Services.js";
-import { employeeCreateServices, employeeLoginServices, employeeLogOutServices } from "../../Services/Employee/Employee.Auth.Services.js";
+import { employeeCreateServices, employeeLoginServices, employeeLogOutServices, getEmployeeProfileService } from "../../Services/Employee/Employee.Auth.Services.js";
 
 export const employeeRegisterController = controllerHandler(async (req, res) => {
-  
     let imagePath = req.file?.path;
     let imageUrl, biometricToken;
     let data = req.body;
-
+    console.log(data)
+    const orgID = await employeeCreateServices.getOrganizationMongoId(data)
+    if (!orgID){
+      throw new ErrorResponse(STATUS_CODES.BAD_REQUEST, 'Organization is not correct');
+    }
+    data.organizationId = orgID
+    
     try {
         // Check if employee is already registered
-        const organizationExist = await employeeCreateServices.finaOrganization(req.body);
+        const organizationExist = await employeeCreateServices.finaOrganization(data);
         console.log(organizationExist)
         if (!organizationExist) {
             console.log("Organization not found");
@@ -24,7 +29,7 @@ export const employeeRegisterController = controllerHandler(async (req, res) => 
         }
 
         // Check if employee is already registered
-        const existingUser = await employeeCreateServices.findExistingUser(req.body);
+        const existingUser = await employeeCreateServices.findExistingUser(data);
         if (existingUser) {
             throw new ErrorResponse(STATUS_CODES.CONFLICT, 'Employee already registered');
         }
@@ -131,12 +136,41 @@ export const employeeImageUploadController = controllerHandler(async (req, res) 
 
     } catch (err) {
         console.error("Error creating employee:", err.message);
+        deleteImage(imagePath)
         throw err instanceof ErrorResponse ? err : new ErrorResponse(STATUS_CODES.INTERNAL_SERVER_ERROR, 'Failed to create employee');
     } finally {
         // // Cleanup uploaded file if it exists
-        // deleteImage(imagePath)
     }
 });
+
+export const employeeProfileGetController = controllerHandler(async (req, res)=> {
+    const userId = req.user._id; // Assuming the user ID is available in `req.user`
+  
+    try {
+      // Call the get profile service
+      const { user } = await getEmployeeProfileService(userId);
+  
+      // Return success response
+      return res.status(STATUS_CODES.OK).json(
+        new SuccessResponse(
+          STATUS_CODES.OK,
+          'Profile fetched successfully',
+          { user }
+        ).toJson()
+      );
+    } catch (err) {
+      // Handle specific errors
+      if (err instanceof ErrorResponse) {
+        throw err;
+      }
+  
+      // Handle unexpected errors
+      throw new ErrorResponse(
+        STATUS_CODES.INTERNAL_SERVER_ERROR,
+        'Failed to fetch profile due to an unexpected error'
+      );
+    }
+})
 
 export const employeeForgotPasswordController = controllerHandler(async (req, res) => {
   res.send("Not Implemented Yet")
@@ -145,3 +179,5 @@ export const employeeForgotPasswordController = controllerHandler(async (req, re
 export const employeeChangePasswordController = controllerHandler(async (req, res) => {
   res.send("Not Implemented Yet")
 });
+
+

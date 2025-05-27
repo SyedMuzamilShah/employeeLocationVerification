@@ -3,17 +3,18 @@ import { Router } from "express";
 import { adminJwtDecode } from "../Middlewares/Admin.Middleware.js";
 import { upload } from "../Middlewares/Multer.Middleware.js";
 import { validateHandler } from "../Utils/ValidateHandler.js"
-import { validateOrganizationEditRoute, validateOrganizationRoutes } from "../Utils/Validators/Organization.Validation.js";
+import { validateOrganizationDeleteRoute, validateOrganizationEditRoute, validateOrganizationGetRoute, validateOrganizationRoutes } from "../Utils/Validators/Organization.Validation.js";
 import { adminGetEmployeeStatisticsRoute, adminOrganizationTaskStatisticsRoute } from "../Utils/Validators/Admin.Statistics.Validation.js";
 import { adminGetEmployeeRoleStatisticsController, adminOrganizationTaskStatisticsController } from "../Controllers/Admin/AdminStatistics.Controller.js";
 import { adminCreateOrganization, adminDeleteOrganization, adminEditOrganizationController, adminGetAllOrganization } from "../Controllers/Admin/Organization.Controllers.js"
 import { validateAdminChangePasswordRoutes, validateAdminForgetPasswordRoutes, validateAdminLoginRoutes, validateAdminRefreshTokenRoutes, validateAdminRegisterRoutes } from "../Utils/Validators/Admin.Validation.js";
-import { taskAssignController, taskCreateController, taskDeleteController, taskReadController, taskStatusChangeController, taskUpdateController, taskVerifiedController } from "../Controllers/Admin/Task.Controllers.js";
+import { taskAssignController, taskAssignGetController, taskCreateController, taskDeleteController, taskReadController, taskStatusChangeController, taskUpdateController, taskVerifiedController } from "../Controllers/Admin/Task.Controllers.js";
 import { adminRegisterController, adminLoginController, adminProfileController, adminForgotPasswordController, adminChangePasswordController, adminRefreshToken, adminLogoutController } from "../Controllers/Admin/Admin.Controllers.js";
-import { validateTaskAssignRoute, validateTaskCreationRoute, validateTaskDeleteRoute, validateTaskGetRoute, validateTaskStatusChangeRoute, validateTaskUpdateRoute, validateTaskVerifiedRoute } from "../Utils/Validators/Task.Validation.js";
-import { validateEmployeeAllowPictureRoutes, validateEmployeeDeleteRoutes, validateEmployeeEditRoutes, validateEmployeeGetRoutes, validateEmployeeRegisterRoutes, validateEmployeeRoleChangeRoute, validateEmployeeStatusChangeRoutes } from "../Utils/Validators/Employee.Validation.js";
-import { employeeAddControllerForAdmin, employeeBasicUpdateControllerForAdmin, employeeDeleteControllerForAdmin, employeeGetControllerForAdmin, employeeImageAllowControllerForAdmin, employeeRoleChangeControllerForAdmin, employeeStatusChangeControllerForAdmin, employeeUpdateToGetherControllerForAdmin } from "../Controllers/Admin/AdminEmployee.Controllers.js"
-
+import { validateTaskAssignedGetRoute, validateTaskAssignRoute, validateTaskCreationRoute, validateTaskDeleteRoute, validateTaskGetRoute, validateTaskStatusChangeRoute, validateTaskUpdateRoute, validateTaskVerifiedRoute } from "../Utils/Validators/Task.Validation.js";
+import { validateEmployeeAllowPictureRoutes, validateEmployeeDeleteRoutes, validateEmployeeEditRoutes, validateEmployeeGetRoutes, validateEmployeeRegisterRoutes, validateEmployeeRejectPictureRoutes, validateEmployeeRoleChangeRoute, validateEmployeeStatusChangeRoutes } from "../Utils/Validators/Employee.Validation.js";
+import { employeeAddControllerForAdmin, employeeBasicUpdateControllerForAdmin, employeeDeleteControllerForAdmin, employeeGetControllerForAdmin, employeeImageAllowControllerForAdmin, employeeImageRejectControllerForAdmin, employeeRoleChangeControllerForAdmin, employeeStatusChangeControllerForAdmin, employeeUpdateToGetherControllerForAdmin } from "../Controllers/Admin/AdminEmployee.Controllers.js"
+import { addressSuggestionValidationRoute } from "../Utils/Validators/Admin.Address.Validation.js";
+import { addressSuggestionsController } from "../Controllers/CoreController.js"
 const adminRoutes = Router();
 // ----------------------- Admin Authentication Routes -----------------------
 
@@ -92,7 +93,7 @@ adminRoutes.route('/organization/register')
  * @returns: 200 OK with list of organizations
  */
 adminRoutes.route('/organization/get')
-  .get(adminJwtDecode, adminGetAllOrganization);
+  .get(adminJwtDecode, validateOrganizationGetRoute, validateHandler, adminGetAllOrganization);
 
 /**
  * Delete an organization
@@ -100,7 +101,7 @@ adminRoutes.route('/organization/get')
  * @returns: 204 No Content
  */
 adminRoutes.route('/organization/delete')
-  .delete(adminJwtDecode, adminDeleteOrganization);
+  .delete(adminJwtDecode, validateOrganizationDeleteRoute, validateHandler, adminDeleteOrganization);
 
 /**
  * Edit an existing organization
@@ -159,6 +160,15 @@ adminRoutes.route('/employee/delete')
 adminRoutes.route('/employee/allow-picture')
   .patch(adminJwtDecode, validateEmployeeAllowPictureRoutes, validateHandler, employeeImageAllowControllerForAdmin);
 
+  /**
+ * Allow or block employee picture uploads
+ * @headers : Requires token
+ * @body : Required [employeeId]
+ * @returns: 204 No Content
+ */
+adminRoutes.route('/employee/reject-picture')
+  .patch(adminJwtDecode, validateEmployeeRejectPictureRoutes, validateHandler, employeeImageRejectControllerForAdmin);
+
 /**
  * Change employee status (e.g., active/inactive)
  * @headers : Requires token
@@ -166,7 +176,7 @@ adminRoutes.route('/employee/allow-picture')
  * @returns: 204 No Content
  */
 adminRoutes.route('/employee/status-change')
-  .post(adminJwtDecode, validateEmployeeStatusChangeRoutes, validateHandler, employeeStatusChangeControllerForAdmin);
+  .patch(adminJwtDecode, validateEmployeeStatusChangeRoutes, validateHandler, employeeStatusChangeControllerForAdmin);
 
 /**
  * Change employee role
@@ -240,7 +250,8 @@ adminRoutes.route('/task/assign')
  * @returns: 200 OK with task assignment data
  */
 adminRoutes.route('/task/verified')
-  .patch(adminJwtDecode, validateTaskVerifiedRoute, validateHandler, taskVerifiedController);
+  .patch(
+    adminJwtDecode, validateTaskVerifiedRoute, validateHandler, taskVerifiedController);
 
 /**
  * @headers : Requires token
@@ -251,6 +262,14 @@ adminRoutes.route('/task/status-change')
   .patch(adminJwtDecode, validateTaskStatusChangeRoute, validateHandler, taskStatusChangeController);
 
 
+/**
+ * Get tasks by organization
+ * @headers : Requires token
+ * @query : Required [organizationId], optional [status, search]
+ * @returns: 200 OK with list of tasks : assignments
+ */
+adminRoutes.route('/task/assigned-detail')
+  .get(adminJwtDecode, validateTaskAssignedGetRoute, validateHandler, taskAssignGetController);
 
 
 // ----------------------- Statistics -----------------------
@@ -268,7 +287,15 @@ adminRoutes.route('/statistics/task')
  * @returns: 200 OK with task-statistics [role, count]
  */
 adminRoutes.route('/statistics/employee-role')
-  // .get(adminJwtDecode, adminGetEmployeeStatisticsRoute, validateHandler, adminGetEmployeeRoleStatisticsController);
-  .get(adminGetEmployeeRoleStatisticsController);
+  .get(adminJwtDecode, adminGetEmployeeStatisticsRoute, validateHandler, adminGetEmployeeRoleStatisticsController);
 
+
+// ----------------------- Address -----------------------
+/**
+ * @headers : Requires token
+ * @body : Required [address]
+ * @returns: 200 OK with response
+ */
+adminRoutes.route('/address/get-suggestions')
+  .get(adminJwtDecode, addressSuggestionValidationRoute, validateHandler, addressSuggestionsController);
 export { adminRoutes }

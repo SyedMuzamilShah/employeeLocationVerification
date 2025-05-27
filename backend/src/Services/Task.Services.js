@@ -6,7 +6,7 @@ import { taskAssignmentModel, taskAssignmentStatus, taskAssignmentValidateMethod
 import { ErrorResponse } from "../Utils/Error.js";
 import { faceVerification } from "../Utils/FaceBioHandler.js";
 import { calculateDistance, getDistanceInMeters } from "../Utils/Distance_Calculator.js"
-import { isValidObjectId } from "mongoose";
+import mongoose, { isValidObjectId } from "mongoose";
 import path from "path"
 import { handleFaceVerification, setSubmissionInfo, validateEmployee, validateTask, validateTaskAssignment, verifyLocation } from "./TaskFunction/TaskCompletion.Method.js";
 const handleDatabaseError = (error) => {
@@ -27,9 +27,7 @@ export const taskCreateServices = async (dataObject) => {
         } = dataObject;
 
         let query
-        query = isValidObjectId(organizationId)
-            ? { _id: organizationId, createdBy: adminId }
-            : { organizationId, createdBy: adminId };
+        query = { _id: organizationId, createdBy: adminId }
 
         // 🔍 Check if organization exists
         const org = await organizationModel.findOne(query);
@@ -81,7 +79,7 @@ export const taskUpdateService = async (dataObject) => {
             throw new ErrorResponse(STATUS_CODES.NOT_FOUND, "Task not found");
         }
 
-        const allowedFields = ['title', 'name', 'description', 'status', 'dueDate', 'location'];
+        const allowedFields = ['title', 'name', 'description', 'status', 'dueDate', 'location', 'aroundDistanceMeter'];
 
         for (const key of allowedFields) {
             if (dataObject[key] !== undefined) {
@@ -98,7 +96,7 @@ export const taskUpdateService = async (dataObject) => {
 
 export const taskReadService = async () => {
     try {
-        const tasks = await taskModel.find();
+        const tasks = await taskModel.find().sort({ createdAt: -1 }).lean();
         return { tasks };
     } catch (error) {
         console.error("Error in taskReadService:", error.message);
@@ -116,7 +114,7 @@ export const taskDeleteService = async (dataObject) => {
 
         const response = await taskModel.findByIdAndDelete(taskId);
         // taskModel.deleteMany
-
+        console.log(response)
         // if task is deleted then delete all the task from task assignment model
         // if the task is deleted then it will be deleted from that corresponding assignment employees
         await taskAssignmentModel.deleteMany({ taskId: taskId });
@@ -135,6 +133,7 @@ export const taskAssignService = async (dataObject) => {
     }
 
     try {
+        console.log("Task Assign Services")
         console.log(dataObject)
         const task = await taskModel.findById(taskId);
         if (!task) throw new ErrorResponse(404, "Task not found");
@@ -165,7 +164,7 @@ export const taskAssignService = async (dataObject) => {
                 employeeId,
                 taskId,
                 deadline: deadline ?? task.dueDate,
-                allowPicture: pictureAllowed,
+                pictureAllowed: pictureAllowed,
                 faceVerification : faceVerification
             });
 
@@ -209,6 +208,7 @@ export const taskDeAssignServices = async (dataObject) => {
 
 export const taskVerifiedServices = async (dataObject) => {
     try {
+        console.log(dataObject)
         let { employeesId, taskId } = dataObject;
         if (!Array.isArray(employeesId)) {
             employeesId = [employeesId];
@@ -218,7 +218,7 @@ export const taskVerifiedServices = async (dataObject) => {
             taskId,
             employeeId: { $in: employeesId },
         });
-
+        console.log(taskAssignments)
         if (taskAssignments.length === 0) {
             throw new ErrorResponse(404, "No task assignments found for given employee(s)");
         }
@@ -275,7 +275,7 @@ export const taskStatusChangeServices = async (dataObject) => {
 
 
 export const getTasksWithAssignments = async (dataObject) => {
-    const { adminId, organizationId, status, search } = dataObject;
+    const { adminId, organizationId, status, search, taskId } = dataObject;
     console.log(dataObject)
     try {
         const isorganizationExistsOrg = await organizationModel.findById({ _id: organizationId, createdBy: adminId })
@@ -293,6 +293,9 @@ export const getTasksWithAssignments = async (dataObject) => {
             adminId
         };
 
+        if(taskId){
+            query._id = taskId
+        }
         if (status && status.toUpperCase() !== "ALL") {
             query.status = status.toUpperCase();
         }
@@ -304,7 +307,7 @@ export const getTasksWithAssignments = async (dataObject) => {
             ];
         }
 
-        const tasks = await taskModel.find(query).lean();
+        const tasks = await taskModel.find(query).sort({createdAt : -1}).lean();
         const taskIds = tasks.map((task) => task._id);
 
         const assignments = await taskAssignmentModel.find({
@@ -320,7 +323,8 @@ export const getTasksWithAssignments = async (dataObject) => {
 
         const tasksWithAssignment = tasks.map((task) => ({
             ...task,
-            assignment: taskAssignmentsMap[task._id.toString()] || []
+            // assignment: taskAssignmentsMap[task._id.toString()] || []
+            assignment: assignments
         }));
 
         return { tasks: tasksWithAssignment };
@@ -341,6 +345,123 @@ export const getTasksWithAssignments = async (dataObject) => {
     }
 };
 
+
+export const getAssignTaskServices = async (dataObject) => {
+    const { adminId, organizationId, status, search, taskId } = dataObject;
+    console.log(dataObject);
+    try {
+        // Optional: Check organization
+        // const isorganizationExistsOrg = await organizationModel.findOne({ _id: organizationId, createdBy: adminId });
+        // if (!isorganizationExistsOrg) {
+        //     throw new ErrorResponse(STATUS_CODES.NOT_FOUND, "Organization not found");
+        // }
+
+        const taskExists = await taskModel.findById(taskId);
+        if (!taskExists) {
+            throw new ErrorResponse(STATUS_CODES.NOT_FOUND, "Task not found");
+        }
+
+        const matchStage = {
+            taskId: new mongoose.Types.ObjectId(taskId),
+        };
+
+        if (status && status.toUpperCase() !== "ALL") {
+            matchStage.status = status.toUpperCase();
+        }
+
+        console.log("matchStage:", matchStage);
+
+        const pipeline = [
+            { $match: matchStage },
+
+            // Join with employeeModel
+            {
+                $lookup: {
+                    from: "employees",
+                    localField: "employeeId",
+                    foreignField: "_id",
+                    as: "employee"
+                }
+            },
+            { $unwind: "$employee" },
+
+            // Join with taskModel to get location
+            {
+                $lookup: {
+                    from: "tasks",
+                    localField: "taskId",
+                    foreignField: "_id",
+                    as: "task"
+                }
+            },
+            { $unwind: "$task" },
+
+            // Optional search
+            ...(search ? [{
+                $match: {
+                    $or: [
+                        { "employee.userName": { $regex: search, $options: "i" } },
+                        { "employee.email": { $regex: search, $options: "i" } }
+                    ]
+                }
+            }] : []),
+
+            // Final projection
+            {
+                $addFields: {
+                    taskLocation: "$task.location", // Flatten the task.location to top level
+                    taskLocationRadius : "$task.aroundDistanceMeter"
+
+                }
+              },
+            {
+                $project: {
+                    _id: 0,
+                    taskId: 1,
+                    status: 1,
+                    submittedLate: 1,
+                    validateMethod: 1,
+                    deadline: 1,
+                    submittedAt: 1,
+                    faceVerification: 1,
+                    pictureAllowed: 1,
+                    employeeImage: 1,
+                    employeeLocation: 1,
+                    // location: "$task.location",
+                    
+                    // "task.location": 1,
+                    taskLocation : 1,
+                    taskLocationRadius : 1,
+                    "employee.email": 1,
+                    "employee._id" : 1,
+                    "employee.userName": 1,
+                    "employee.imageUrl": 1
+                }
+            }
+        ];
+
+        const result = await taskAssignmentModel.aggregate(pipeline);
+        console.log("Result:", result);
+        return { assignments: result };
+
+    } catch (error) {
+        console.error("Error in getAssignTaskServices:", error);
+
+        if (error.name === "CastError") {
+            throw new ErrorResponse(
+                STATUS_CODES.BAD_REQUEST,
+                `Invalid ID format: ${error.message}`
+            );
+        }
+
+        throw new ErrorResponse(
+            error.statusCode ?? STATUS_CODES.INTERNAL_SERVER_ERROR,
+            `${error.message}`
+        );
+    }
+};
+
+
 export const taskCompleteService = async (dataObject) => {
     const { employeeId, imageUrl, location, organizationId, taskAssignmentId } = dataObject;
 
@@ -356,22 +477,23 @@ export const taskCompleteService = async (dataObject) => {
     // 4. Set submission info
     const { isLate } = setSubmissionInfo(taskAssignment, task.deadline);
     
-    // 5. Verify location
+    // 5. Verify location void function if error throw error
     await verifyLocation(task.location, location, task.aroundDistanceMeter);
     
     // 6. Handle face verification if required
     if (taskAssignment.faceVerification) {
-        return await handleFaceVerification(taskAssignment, employee, imageUrl, isLate);
+        return await handleFaceVerification(taskAssignment, employee, imageUrl, isLate, location);
     }
 
     
     // 7. If no face verification required, mark as verified
+    taskAssignment.employeeLocation = location
     taskAssignment.status = taskAssignmentStatus.VERIFIED;
     taskAssignment.validateMethod = taskAssignmentValidateMethod.AUTO;
     
     await taskAssignment.save();
     return {
-        method: taskAssignment.validateMethod,
+        method: taskAssignment.validateMethod, // AUTO
         taskAssignment: taskAssignment
     };
 };

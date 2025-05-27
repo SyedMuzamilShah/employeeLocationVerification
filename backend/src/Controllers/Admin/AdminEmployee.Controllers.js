@@ -3,7 +3,7 @@ import { STATUS_CODES } from "../../../constant.js";
 import { employeeCreateServices } from "../../Services/Employee/Employee.Auth.Services.js";
 import { SuccessResponse } from "../../Utils/Success.js";
 import { controllerHandler } from "../../Utils/ControllerHandler.js";
-import { allowImageForProcessService } from "../../Services/Admin/Employee/EmployeeManagement.Services.js";
+import { allowImageForProcessService, rejectImageForProcessService } from "../../Services/Admin/Employee/EmployeeManagement.Services.js";
 import { employeeDelete, employeeRoleChange, employeeStatusChange, employeeUpdateServices, employeeUpdateToGether, getEmployeeServices } from "../../Services/Combine/Employee.Combine.Services.js";
 import fs from "fs";
 import path from 'path';
@@ -73,9 +73,30 @@ export const employeeImageAllowControllerForAdmin = controllerHandler(async (req
     });
 
     // Return success response
-    return res.status(STATUS_CODES.OK).json(
+    return res.status(STATUS_CODES.SUCCESS_NO_RESPONSE).json(
         new SuccessResponse(
-            STATUS_CODES.OK,
+            STATUS_CODES.SUCCESS_NO_RESPONSE,
+            'Biometric token generated successfully',
+            {
+                userId: user._id,
+                imageAccepted: user.imageAcceptedForToken,
+                biometricTokenGenerated: !!user.biometricToken
+            }
+        ).toJson()
+    );
+});
+
+export const employeeImageRejectControllerForAdmin = controllerHandler(async (req, res) => {
+
+    // Process the image and update user
+    const user = await rejectImageForProcessService({
+        ...req.body,
+    });
+
+    // Return success response
+    return res.status(STATUS_CODES.SUCCESS_NO_RESPONSE).json(
+        new SuccessResponse(
+            STATUS_CODES.SUCCESS_NO_RESPONSE,
             'Biometric token generated successfully',
             {
                 userId: user._id,
@@ -136,8 +157,7 @@ export const employeeUpdateToGetherControllerForAdmin = controllerHandler (async
 export const employeeStatusChangeControllerForAdmin = controllerHandler(async (req, res) => {
 
     const adminId = req.user._id
-
-    console.log(req.query);
+    
     const dataObject = {
         ...req.body,
         adminId

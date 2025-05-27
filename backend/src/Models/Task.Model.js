@@ -4,7 +4,7 @@ const TaskStatus = {
   CREATED: "CREATED",
   ASSIGNED: "ASSIGNED",
   COMPLETED: "COMPLETED",
-  VERIFIED: "VERIFIED",
+  // VERIFIED: "VERIFIED",
 };
 
 

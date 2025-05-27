@@ -9,7 +9,7 @@ import { ErrorResponse } from "../Utils/Error.js";
  */
 export const organizationIsRegistered = async (dataObject) => {
     const { email, organizationNumber } = dataObject;
-    
+
     try {
         // Build dynamic query
         const queryConditions = [{ email }];
@@ -22,7 +22,7 @@ export const organizationIsRegistered = async (dataObject) => {
         }).lean();
 
         return !!existingOrganization;
-        
+
     } catch (err) {
         console.error("Organization check error:", err.message);
         throw err;
@@ -36,7 +36,7 @@ export const organizationIsRegistered = async (dataObject) => {
  */
 export const organizationCreateServices = async (dataObject) => {
     const { adminId, name, phoneNumber, address, website, email, organizationNumber } = dataObject;
-    
+
     try {
         // Check for existing organization
         const queryConditions = [{ email }];
@@ -64,7 +64,7 @@ export const organizationCreateServices = async (dataObject) => {
             email,
             phoneNumber,
             website,
-            location : address,
+            location: address,
             createdBy: adminId,
         });
 
@@ -86,19 +86,16 @@ export const organizationCreateServices = async (dataObject) => {
  * @returns {Object} - Success status and deleted organization
  */
 export const deleteOrganization = async (dataObject) => {
-    const { adminId, id, organizationId } = dataObject;
+    const { adminId, organizationId: id } = dataObject;
 
     try {
         // Build dynamic query
         const query = { createdBy: adminId };
-        if (organizationId) {
-            query.organizationId = organizationId;
-        } else if (id) {
-            query._id = id;
-        }
+
+        query._id = id;
 
         const organization = await organizationModel.findOneAndDelete(query);
-        
+
         if (!organization) {
             throw new ErrorResponse(
                 STATUS_CODES.NOT_FOUND,
@@ -106,9 +103,9 @@ export const deleteOrganization = async (dataObject) => {
             );
         }
 
-        return { 
-            success: true, 
-            organization: organization.toObject() 
+        return {
+            success: true,
+            organization: organization.toObject()
         };
     } catch (error) {
         console.error("Organization deletion error:", error.message);
@@ -122,20 +119,18 @@ export const deleteOrganization = async (dataObject) => {
  * @returns {Object} - Found organization(s)
  */
 export const getAllOrganization = async (dataObject) => {
-    const { adminId, id, organizationId } = dataObject;
+    const { adminId, organizationId } = dataObject;
 
     try {
         // Build dynamic query
         const query = { createdBy: adminId };
-        if (organizationId) {
-            query.organizationId = organizationId;
-        } else if (id) {
+        if (organizationId){
             query._id = id;
         }
 
         const organizations = await organizationModel.find(query).lean();
         return { organizations };
-        
+
     } catch (error) {
         if (error.name === 'CastError') {
             throw new ErrorResponse(
@@ -157,16 +152,13 @@ export const getAllOrganization = async (dataObject) => {
  * @returns {Object} - Updated organization
  */
 export const updateOrganization = async (dataObject) => {
-    const { adminId, id, organizationId, ...updateData } = dataObject;
+    const { adminId, organizationId, ...updateData } = dataObject;
 
     try {
         // Build dynamic query
         const query = { createdBy: adminId };
-        if (organizationId) {
-            query.organizationId = organizationId;
-        } else if (id) {
-            query._id = id;
-        }
+
+        query._id = organizationId;
 
         const organization = await organizationModel.findOneAndUpdate(
             query,
@@ -182,7 +174,7 @@ export const updateOrganization = async (dataObject) => {
         }
 
         return { organization };
-        
+
     } catch (error) {
         if (error.name === 'CastError') {
             throw new ErrorResponse(

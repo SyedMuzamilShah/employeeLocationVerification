@@ -34,8 +34,8 @@ const employeeSchema = new Schema(
       index: true
     },
     organizationId: {
-      type: String,
-      ref: "organization.organizationId",
+      type: mongoose.Types.ObjectId,
+      ref: "organization",
       required: true,
       index: true
     },
@@ -104,7 +104,7 @@ const employeeSchema = new Schema(
       type: String,
       enum: Object.values(EmployeeRole),
       required: true,
-      default: EmployeeRole.GUEST
+      default: EmployeeRole.EMPLOYEE
     },
     status: {
       type: String,
@@ -172,8 +172,8 @@ const employeeSchema = new Schema(
 );
 
 // Indexes for better query performance
-employeeSchema.index({ email: 1 });
-employeeSchema.index({ organizationId: 1, status: 1 });
+// employeeSchema.index({ email: 1 });
+// employeeSchema.index({ organizationId: 1, status: 1 });
 
 // Password hashing middleware
 employeeSchema.pre("save", async function(next) {

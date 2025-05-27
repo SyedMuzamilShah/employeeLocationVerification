@@ -9,8 +9,10 @@ import { isValidObjectId } from 'mongoose';
  */
 export const validateEmployeeRegisterRoutes = [
     body('organizationId')
-        .notEmpty().withMessage('Organization ID is required')
-        .custom(checkOrganizationExists),
+    .notEmpty()
+    .withMessage('Organization id required')
+    .isMongoId()
+    .withMessage("Invalid Id"),
 
     body('userName')
         .trim()
@@ -60,16 +62,6 @@ export const validateEmployeeRegisterRoutes = [
         })
 ];
 
-async function checkOrganizationExists(orgId) {
-    let org;
-    if (isValidObjectId(orgId)) {
-        org = await organizationModel.findById(orgId);
-    } else {
-        org = await organizationModel.findOne({ organizationId: orgId });
-    }
-    if (!org) throw new Error('Organization not found');
-    return true;
-}
 
 /**
  * Employee Login Validator
@@ -149,8 +141,8 @@ export const validateEmployeeStatusChangeRoutes = [
  */
 export const validateEmployeeGetRoutes = [
     query('organizationId')
-        .notEmpty().withMessage('organizationId is required')
-    // .isMongoId().withMessage('Invalid organizationId ID format')
+    .notEmpty().withMessage('organizationId is required')
+    .isMongoId().withMessage('Invalid organizationId ID format')
 ];
 
 /**
@@ -160,6 +152,7 @@ export const validateEmployeeGetRoutes = [
 export const validateEmployeeEditRoutes = [
     body('employeeId')
         .notEmpty().withMessage('Employee ID is required')
+        .bail()
         .isMongoId().withMessage('Invalid Employee ID format'),
 
     body('name')
@@ -214,6 +207,12 @@ export const validateEmployeeDeleteRoutes = [
  * Validates employee ID for picture permission changes
  */
 export const validateEmployeeAllowPictureRoutes = [
+    body('employeeId')
+        .notEmpty().withMessage('Employee ID is required')
+        .isMongoId().withMessage('Invalid Employee ID format'),
+];
+
+export const validateEmployeeRejectPictureRoutes = [
     body('employeeId')
         .notEmpty().withMessage('Employee ID is required')
         .isMongoId().withMessage('Invalid Employee ID format'),
@@ -291,7 +290,7 @@ export const validateEmployeeCompleteTaskRoute = [
         .withMessage("Location is required")
         .bail()
         .custom((value) => {
-            console.log(value)
+            // console.log(value)
             if (typeof value !== 'object' || value.type !== 'Point' || !Array.isArray(value.coordinates)) {
                 throw new Error("Location must be a GeoJSON Point with coordinates");
             }

@@ -20,7 +20,7 @@ export const validateTaskAssignment = async (employeeId, taskAssignmentId) => {
     if (taskAssignment.status !== taskAssignmentStatus.ASSIGNED) {
         throw new ErrorResponse(
             STATUS_CODES.CONFLICT,
-            `Task completion not allowed: ${taskAssignment.status}`
+            `Task submission is not allow due to status : ${taskAssignment.status}`
         );
     }
 
@@ -71,7 +71,7 @@ export const verifyLocation = (taskLocation, currentLocation, allowedDistance) =
 };
 
 // 6. Handle Face Verification
-export const handleFaceVerification = async (taskAssignment, employee, imageUrl, isLate) => {
+export const handleFaceVerification = async (taskAssignment, employee, imageUrl, isLate, location) => {
     if (!imageUrl) {
         throw new ErrorResponse(STATUS_CODES.BAD_REQUEST, "Face Image Required");
     }
@@ -92,8 +92,8 @@ export const handleFaceVerification = async (taskAssignment, employee, imageUrl,
     }
     
     // const confidenceThreshold = result.thresholds["1e-3"]; // medium strictness
-    const confidenceThreshold = result.thresholds["1e-4"]; // medium strictness
-    // const confidenceThreshold = result.thresholds["1e-5"]; // medium strictness
+    // const confidenceThreshold = result.thresholds["1e-4"]; // medium strictness
+    const confidenceThreshold = result.thresholds["1e-5"]; // medium strictness
 
     console.log(`Threshold  is used : ${confidenceThreshold}`)
     console.log(`Confidence is used : ${result.confidence}`)
@@ -104,16 +104,20 @@ export const handleFaceVerification = async (taskAssignment, employee, imageUrl,
         taskAssignment.threshold = confidenceThreshold
         taskAssignment.confidence = result.confidence
 
+        taskAssignment.employeeLocation = location
+        
         taskAssignment.status = taskAssignmentStatus.VERIFIED;
         taskAssignment.validateMethod = taskAssignmentValidateMethod.AUTO;
     } else if (taskAssignment.pictureAllowed) {
         taskAssignment.threshold = confidenceThreshold
         taskAssignment.confidence = result.confidence
 
+        taskAssignment.employeeLocation = location
+
         taskAssignment.status = taskAssignmentStatus.SUBMITTED;
         // taskAssignment.image = `${config.IMAGE_BASE_URL}/${path.basename(imageUrl)}`;
-        taskAssignment.image = `http://localhost:3000/images/${path.basename(imageUrl)}`;
-        taskAssignment.validateMethod = taskAssignmentValidateMethod.MANUALLY;
+        taskAssignment.employeeImage = `http://localhost:3000/images/${path.basename(imageUrl)}`;
+        taskAssignment.validateMethod = taskAssignmentValidateMethod.MANAULLY;
     } else {
         throw new ErrorResponse(
             STATUS_CODES.BAD_REQUEST,

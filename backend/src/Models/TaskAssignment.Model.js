@@ -3,8 +3,8 @@ import mongoose, { Schema, model } from "mongoose";
 export const taskAssignmentStatus = {
     ASSIGNED: "ASSIGNED",
     SUBMITTED : "SUBMITTED",
-    INPROGRESS: "INPROGRESS",
-    COMPLETED: "COMPLETED",
+    // INPROGRESS: "INPROGRESS",
+    // COMPLETED: "COMPLETED",
     VERIFIED: "VERIFIED",
     REJECTED: "REJECTED"
 };
@@ -27,11 +27,9 @@ const taskAssignmentSchema = new Schema(
         },
         confidence : {
             type: Number,
-            select: false,
         },
         threshold : {
             type:Number,
-            select: false,
         },
         validateMethod : {
             type: String,
@@ -57,8 +55,13 @@ const taskAssignmentSchema = new Schema(
             type : Boolean,
             default : false
         },
-        image : {
+        employeeImage : {
             type : String
+        },
+        employeeLocation: {
+            type: { type: String, default: "Point" },
+            coordinates: [Number],  // [longitude, latitude]
+            address : String
         },
         status: {
             type: String,

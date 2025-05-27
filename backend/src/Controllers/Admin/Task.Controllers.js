@@ -2,6 +2,7 @@ import { STATUS_CODES } from "../../../constant.js";
 import { SuccessResponse } from "../../Utils/Success.js";
 import { controllerHandler } from "../../Utils/ControllerHandler.js";
 import {
+  getAssignTaskServices,
   getTasksWithAssignments,
   taskAssignService,
   taskCompleteService,
@@ -37,6 +38,20 @@ export const taskReadController = controllerHandler(async (req, res) => {
       ).toJson());
 });
 
+export const taskAssignGetController = controllerHandler(async (req, res) => {
+  const adminId = req.user._id;
+
+  const dataObject = { ...req.query, adminId };
+
+  const {assignments} = await getAssignTaskServices(dataObject);
+    return res.status(STATUS_CODES.OK)
+      .json(new SuccessResponse(
+        STATUS_CODES.OK,
+        'Tasks fetched successfully',
+        { tasks : assignments }
+      ).toJson());
+});
+
 export const taskUpdateController = controllerHandler (async (req, res) => {
   const adminId = req.user._id;
 
@@ -48,7 +63,7 @@ export const taskUpdateController = controllerHandler (async (req, res) => {
       .json(new SuccessResponse(
         STATUS_CODES.OK,
         'Tasks update successfully',
-        { task }
+        task
       ).toJson());
 })
 
@@ -72,7 +87,6 @@ export const taskAssignController = controllerHandler(async (req, res) => {
 
   const dataObject = { ...req.body, ...req.query, adminId };
   const task = await taskAssignService(dataObject);
-  
   return res.status(STATUS_CODES.OK)
     .json(new SuccessResponse(STATUS_CODES.OK, 'Task assigned successfully', { task }).toJson());
 });

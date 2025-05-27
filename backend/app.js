@@ -2,12 +2,17 @@ import express from 'express';
 import dotenv from 'dotenv'
 const app = express();
 import path from 'path';
+import cors from 'cors'
 
 // middleware to activate the app/server public folder to access them in our all app
 app.use("/images", express.static('./public/temp/'))
 
 // for ejs used
 app.set('view engine', 'ejs');
+
+
+app.use(cors());
+app.options('*', cors());
 
 // Help to get and read json data
 app.use(express.json())

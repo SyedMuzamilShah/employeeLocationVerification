@@ -10,9 +10,9 @@ export const employeeAssignedTaskRead = controllerHandler(async (req, res) => {
     const employeeId = req.user._id;
 
     const dataObject = {employeeId, ...req.body, ...req.query}
-    const {task} = await employeeAssignTaskReadService(dataObject)
+    const {tasks} = await employeeAssignTaskReadService(dataObject)
 
-    res.status(STATUS_CODES.OK).json(new SuccessResponse(STATUS_CODES.OK, "Task read", task).toJson())
+    res.status(STATUS_CODES.OK).json(new SuccessResponse(STATUS_CODES.OK, "Task read", tasks).toJson())
 })
 
 
@@ -27,16 +27,38 @@ export const employeeCompletedTaskController = controllerHandler(async (req, res
   const dataObject = { ...req.body, employeeId, ...req.query, imageUrl };
 
   // const result = await taskCompleteService(dataObject);
-  const { method, taskAssignment} =  await taskCompleteService(dataObject);
-  if (method == taskAssignmentValidateMethod.AUTO){
-    deleteImage(imageUrl) // delete image from local database
+  let taskAssignment; // declare it here
+  try {
+    const { method, taskAssignment: result} =  await taskCompleteService(dataObject);
+    taskAssignment = result;
+    
+    if (method == taskAssignmentValidateMethod.AUTO){
+      if (imageUrl){
+        deleteImage(imageUrl) // delete image from local database
+      }
+      console.log("Task verified by system ")
+      console.log(taskAssignment)
+      return res.status(STATUS_CODES.OK).json(
+        new SuccessResponse(
+          STATUS_CODES.OK,
+          'Task verified successfully by system',
+          taskAssignment
+        ).toJson()
+      );
+    }
+
+  }catch (err){
+    if (imageUrl){
+      deleteImage(imageUrl) // delete image from local database
+    }
+    throw err
   }
 
-  
+  console.log(taskAssignment)
   return res.status(STATUS_CODES.OK).json(
     new SuccessResponse(
       STATUS_CODES.OK,
-      'Task completed successfully',
+      'Task submitted for admin verification',
       taskAssignment
     ).toJson()
   );

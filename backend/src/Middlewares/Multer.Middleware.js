@@ -16,7 +16,7 @@ const ensureUploadsDir = () => {
 
 // 2. Enhanced File Filter
 const imageFileFilter = (req, file, cb) => {
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
 
   // get extension
   const ext = path.extname(file.originalname).toLowerCase();
@@ -49,6 +49,7 @@ const storage = multer.diskStorage({
 
 // 4. Final Multer Configuration
 export const upload = multer({
+  
   storage,
   limits: {
     fileSize: MAX_FILE_SIZE,

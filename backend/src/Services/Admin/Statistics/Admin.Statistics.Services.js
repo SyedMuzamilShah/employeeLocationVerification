@@ -6,12 +6,10 @@ import { employeeModel, EmployeeRole } from "../../../Models/Employee.Model.js"
 export const adminOrganizationTaskStatistics = async (dataObject) => {
     try {
         const { year, organizationId, adminId } = dataObject;
-
         // Convert organizationId to ObjectId if needed
         const orgId = mongoose.Types.ObjectId.isValid(organizationId) 
             ? new mongoose.Types.ObjectId(organizationId)
             : organizationId;
-
         const stats = await taskModel.aggregate([
             {
                 $match: {
@@ -20,8 +18,8 @@ export const adminOrganizationTaskStatistics = async (dataObject) => {
                         $lt: new Date(`${Number(year) + 1}-01-01T00:00:00.000Z`)
                     },
                     $or: [
-                        { organizationId: orgId }, // try as ObjectId
-                        { organizationId: organizationId } // try as string
+                        // { organizationId: orgId }, // try as ObjectId
+                        { organizationId: orgId } // try as string
                     ]
 
                 }
@@ -44,7 +42,6 @@ export const adminOrganizationTaskStatistics = async (dataObject) => {
             }
         ]);
 
-        console.log(stats)
         // Format the response with all months (including those with 0 tasks)
         const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -100,7 +97,7 @@ export const adminGetEmployeeRoleStatistics = async (dataObject) => {
                 }
             }
         ]);
-        console.log(roleCounts)
+
         // Create a map for efficient lookup
         const roleCountMap = new Map(
             roleCounts.map(item => [item._id, item.count])
@@ -111,7 +108,7 @@ export const adminGetEmployeeRoleStatistics = async (dataObject) => {
             role,
             count: roleCountMap.get(role) || 0
         }));
-        console.log(formattedStats)
+        
         // Calculate totals
         const totalEmployees = formattedStats.reduce((sum, {count}) => sum + count, 0);
 

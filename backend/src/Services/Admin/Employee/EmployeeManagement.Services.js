@@ -107,3 +107,56 @@ export const allowImageForProcessService = async (dataObject) => {
         );
     }
 };
+
+export const rejectImageForProcessService = async (dataObject) => {
+    const { employeeId } = dataObject;
+
+    try {
+        // Validate input
+        if (!employeeId) {
+            throw new ErrorResponse(
+                STATUS_CODES.BAD_REQUEST,
+                'Employee ID is required'
+            );
+        }
+        
+        await employeeModel.findByIdAndUpdate(employeeId, {
+            imageUrl : null
+        })
+        
+        return {
+            success: true,
+            // data: {
+            //     employeeId: user._id,
+            //     imageAccepted: user.imageAcceptedForToken,
+            //     biometricTokenUpdated: !!faceToken
+            // }
+        };
+
+    } catch (error) {
+        if (error instanceof ErrorResponse) {
+            throw error;
+        }
+
+        console.error('Image processing error:', error);
+
+        // Handle specific face registration errors
+        if (error.message.includes('Face detection failed')) {
+            throw new ErrorResponse(
+                STATUS_CODES.UNPROCESSABLE_ENTITY,
+                'No face detected in the provided image'
+            );
+        }
+
+        // Re-throw known error types
+        if (error instanceof ErrorResponse) {
+            throw error;
+        }
+
+        // Handle unexpected errors
+        throw new ErrorResponse(
+            STATUS_CODES.INTERNAL_SERVER_ERROR,
+            'Failed to process image for biometric token'
+        );
+    }
+};

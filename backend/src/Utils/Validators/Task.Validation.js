@@ -1,6 +1,12 @@
 import { body, query } from 'express-validator'
 
 export const validateTaskCreationRoute = [
+  body('radius')
+  .optional()
+  .notEmpty()
+  .withMessage("Radius is required")
+  .isNumeric()
+  .withMessage("Radius must be a number"),
   body("title")
     .notEmpty()
     .withMessage("Title is required")
@@ -8,7 +14,9 @@ export const validateTaskCreationRoute = [
     .withMessage("Task title must be between 3-50 characters"),
   body("organizationId")
     .notEmpty()
-    .withMessage("organization id is required"),
+    .withMessage("organization id is required")
+    .isMongoId()
+    .withMessage("organization id invalid formate"),
   body("description")
     .notEmpty()
     .withMessage("Description is required")
@@ -45,20 +53,28 @@ export const validateTaskCreationRoute = [
     .notEmpty()
     .withMessage("Due date is required")
     .bail()
-    .custom((value) => {
-      const dueDate = new Date(value);
-      const now = new Date();
-      const minDue = new Date(now.getTime() + 30 * 60000); // now + 30 minutes
-
-      if (isNaN(dueDate.getTime())) {
-        throw new Error("Invalid date format");
-      }
-
-      if (dueDate < minDue) {
-        throw new Error("Due date must be at least 30 minutes from now");
-      }
-
-      return true;
+    .custom((value, { req }) => {
+      console.log(value)
+        // Parse the input date
+        const dueDate = new Date(value);
+        console.log("Testing the time")
+        console.log(dueDate.toLocaleString())
+        const now = new Date();
+        
+        // Validate the date format first
+        if (isNaN(dueDate.getTime())) {
+            throw new Error("Invalid date format. Please provide a valid date.");
+        }
+        
+        // Calculate minimum allowed date (now + 30 minutes)
+        const minDueDate = new Date(now.getTime() + 30 * 60000);
+        
+        // Check if date is in the future and at least 30 minutes from now
+        if (dueDate < minDueDate) {
+            throw new Error(`Due date must be at least 30 minutes in the future. The earliest allowed is ${minDueDate.toLocaleString()}`);
+        }
+        
+        return true;
     }),
 ];
 
@@ -97,6 +113,22 @@ export const validateTaskGetRoute = [
     .withMessage("invalid Organization id")
 ]
 
+export const validateTaskAssignedGetRoute = [
+  query("taskId")
+    .notEmpty()
+    .withMessage("TaskId id is required")
+    .bail()
+    .isMongoId()
+    .withMessage("invalid TaskId id"),
+  query("organizationId")
+    .optional()
+    .notEmpty()
+    .withMessage("Organization id is required")
+    .bail()
+    .isMongoId()
+    .withMessage("invalid Organization id")
+]
+
 export const validateTaskUpdateRoute = [
   body("taskId")
     .notEmpty()
@@ -114,7 +146,9 @@ export const validateTaskUpdateRoute = [
     .optional()
 
     .notEmpty()
-    .withMessage("organization id is required"),
+    .withMessage("organization id is required")
+    .isMongoId()
+    .withMessage("Organization id is invalid formate"),
   body("description")
     .optional()
 
@@ -185,26 +219,19 @@ export const validateTaskDeleteRoute = [
 export const validateTaskStatusChangeRoute = []
 
 export const validateTaskVerifiedRoute = [
-  query("taskId")
+  body("taskId")
     .notEmpty()
     .withMessage("Task ID is required")
     .isMongoId()
     .withMessage("Invalid Task ID format"),
 
-  query("employeesId")
-    .custom((value) => {
-      // Convert employeesId into an array if it's a single value
-      if (typeof value === "string") {
-        return [value];  // Return as an array
-      }
-      if (!Array.isArray(value)) {
-        throw new Error("employeesId must be an array");
-      }
-      return value;
-    })
-    .withMessage("employeesId must be an array or a single value"),
+  // body("employeesId")
+  //   .isArray({ min: 1 })
+  //   .withMessage("employeesId must be a non-empty array"),
 
-  query("employeesId.*")
+  body("employeesId.*")
+    .notEmpty()
+    .withMessage("Employee ID is required")
     .isMongoId()
     .withMessage("Each employee ID must be a valid MongoDB ObjectId"),
 ];

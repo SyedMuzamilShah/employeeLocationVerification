@@ -8,7 +8,7 @@ export const adminOrganizationTaskStatisticsController = controllerHandler (asyn
     const dataObject = {adminId, ...req.body, ...req.query, year}
     
     const response = await adminOrganizationTaskStatistics(dataObject)
-    console.log(response)
+    
     return res.status(STATUS_CODES.OK).json(new SuccessResponse(STATUS_CODES.OK, 'Roll statictics fetch successfully', response))
 })
 
