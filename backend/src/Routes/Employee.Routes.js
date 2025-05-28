@@ -44,8 +44,8 @@ employeeRoutes.route("/upload-image")
 
 
 // ----------------------- Employee Task Management Routes -----------------------
-employeeRoutes.route("/task/get")
-  .get(employeeJWTDecode, (req, res, next) => res.send("Employees Get"))
+// employeeRoutes.route("/task/get")
+//   .get(employeeJWTDecode, (req, res, next) => res.send("Employees Get"))
 
 employeeRoutes.route("/task/assign-task-read")
   .get(employeeJWTDecode, validateEmployeeAssignTaskReadRoute, validateHandler, employeeAssignedTaskRead)

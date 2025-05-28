@@ -67,12 +67,12 @@ export const validateTaskCreationRoute = [
         }
         
         // Calculate minimum allowed date (now + 30 minutes)
-        const minDueDate = new Date(now.getTime() + 30 * 60000);
+        // const minDueDate = new Date(now.getTime() + 30 * 60000);
         
-        // Check if date is in the future and at least 30 minutes from now
-        if (dueDate < minDueDate) {
-            throw new Error(`Due date must be at least 30 minutes in the future. The earliest allowed is ${minDueDate.toLocaleString()}`);
-        }
+        // // Check if date is in the future and at least 30 minutes from now
+        // if (dueDate < minDueDate) {
+        //     throw new Error(`Due date must be at least 30 minutes in the future. The earliest allowed is ${minDueDate.toLocaleString()}`);
+        // }
         
         return true;
     }),

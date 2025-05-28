@@ -22,10 +22,12 @@ export const taskCreateServices = async (dataObject) => {
             description,
             organizationId,
             aroundDistanceMeter,
+            radius,
             location,
             dueDate,
         } = dataObject;
-
+        console.log(dataObject)
+        console.log(radius)
         let query
         query = { _id: organizationId, createdBy: adminId }
 
@@ -58,8 +60,9 @@ export const taskCreateServices = async (dataObject) => {
         if (location) {
             taskData.location = location;
         }
-        if (aroundDistanceMeter) {
-            taskData.aroundDistanceMeter = aroundDistanceMeter;
+        if (radius) {
+            // taskData.aroundDistanceMeter = aroundDistanceMeter;
+            taskData.aroundDistanceMeter = radius;
         }
 
         const newTask = new taskModel(taskData);
@@ -427,6 +430,7 @@ export const getAssignTaskServices = async (dataObject) => {
                     pictureAllowed: 1,
                     employeeImage: 1,
                     employeeLocation: 1,
+                    confidence: 1,
                     // location: "$task.location",
                     
                     // "task.location": 1,

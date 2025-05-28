@@ -105,6 +105,12 @@ export const employeeAssignTaskReadService = async (dataObject) => {
         aroundDistanceMeter : "$taskInfo.aroundDistanceMeter"
       },
     },
+
+    {
+    $sort: {
+      updatedAt: -1, // Change this field to createdAt, submittedAt, etc. as needed
+    },
+  },
   ]);
   console.log(tasks)
   return { tasks };

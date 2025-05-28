@@ -205,7 +205,10 @@ adminRoutes.route('/employee/update-data')
  * @returns: 201 Created with task data
  */
 adminRoutes.route('/task/create')
-  .post(adminJwtDecode, validateTaskCreationRoute, validateHandler, taskCreateController);
+  .post(adminJwtDecode,(req,res,next)=>{
+    console.log(req.body)
+    next()
+  }, validateTaskCreationRoute, validateHandler, taskCreateController);
 
 /**
  * Get tasks by organization

@@ -7,7 +7,26 @@ export const getAddressSuggestions = async (input) => {
     const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${input}&apiKey=${process.env.GeoApiKey}`;
 
     try {
-        // const response = await axios.get(url);
+        const response = await axios.get(url);
+        const simplified = response.data.features.map((feature) => {
+            const props = feature.properties;
+            const coords = feature.geometry.coordinates;
+
+            return {
+                properties: {
+                    name: props.formatted || `${props.city || ''}, ${props.state || ''}, ${props.country || ''}`,
+                    formatted: props.formatted || '',
+                    city: props.city || '',
+                    state: props.state || '',
+                    country: props.country || ''
+                },
+                coordinates: {
+                    latitude: coords[1],
+                    longitude: coords[0]
+                }
+            };
+        });
+        return simplified
         return [
             {
                 "properties": {

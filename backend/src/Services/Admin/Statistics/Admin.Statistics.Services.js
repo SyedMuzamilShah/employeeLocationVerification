@@ -3,6 +3,7 @@ import { STATUS_CODES } from "../../../../constant.js";
 import { taskModel } from "../../../Models/Task.Model.js";
 import { ErrorResponse } from "../../../Utils/Error.js";
 import { employeeModel, EmployeeRole } from "../../../Models/Employee.Model.js"
+
 export const adminOrganizationTaskStatistics = async (dataObject) => {
     try {
         const { year, organizationId, adminId } = dataObject;
@@ -82,12 +83,12 @@ export const adminGetEmployeeRoleStatistics = async (dataObject) => {
 
         // Get all possible roles
         const allRoles = Object.values(EmployeeRole);
-
+        
         // Get counts for each role in the organization
         const roleCounts = await employeeModel.aggregate([
             {
                 $match: {
-                    // organizationId: organizationId
+                    organizationId: new mongoose.Types.ObjectId(organizationId)
                 }
             },
             {
@@ -98,6 +99,7 @@ export const adminGetEmployeeRoleStatistics = async (dataObject) => {
             }
         ]);
 
+        console.log(roleCounts)
         // Create a map for efficient lookup
         const roleCountMap = new Map(
             roleCounts.map(item => [item._id, item.count])
