@@ -58,6 +58,8 @@ class TaskEntities {
   final bool? pictureAllowed;
   final LocationEntities? location;
   final double? aroundDistanceMeter;
+  final DateTime? checkOut;
+  final DateTime? checkIn;
 
   // Optional fields after submission
   final LocationEntities? employeeLocation;
@@ -77,6 +79,8 @@ class TaskEntities {
     this.adminId,
     this.createdAt,
     this.updatedAt,
+    this.checkIn,
+    this.checkOut,
     this.faceVerification,
     this.pictureAllowed,
     this.location,

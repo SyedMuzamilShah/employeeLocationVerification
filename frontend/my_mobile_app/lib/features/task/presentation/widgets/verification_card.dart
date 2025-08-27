@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_mobile_app/core/widgets/my_button.dart';
 import 'package:my_mobile_app/features/camera/presentation/views/camera_capture_view.dart';
+import 'package:my_mobile_app/features/camera/presentation/views/image_capture_view.dart';
 import 'package:my_mobile_app/features/task/domain/entities/task_entities.dart';
 import 'package:my_mobile_app/features/task/presentation/widgets/header_section_card.dart';
 
@@ -69,7 +70,8 @@ class TaskRequirements extends StatelessWidget {
                     onClick: () => Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const CameraCaptureView(),
+                        // builder: (_) => const CameraCaptureView(),
+                        builder: (_) => const FaceDetectionPage(),
                       ),
                     ),
                   ),

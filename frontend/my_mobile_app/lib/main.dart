@@ -45,3 +45,72 @@ class MyApp extends ConsumerWidget {
     );
   }
 }
+
+
+
+
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   // await TokenService().initialize();
+//   // await Hive.initFlutter();
+//   // await LocalDatabaseService().init(); // Initialize local database
+//   runApp(ProviderScope(child: const MyApp()));
+// }
+
+// class MyApp extends StatelessWidget {
+//   const MyApp({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: Scaffold(
+//       body: Column(
+//         spacing: 20,
+//         children: [
+//           ChildOne(),
+//           ChildTwo()
+//         ],
+//       ),
+//     ),
+//     );
+//   }
+// }
+
+// class ChildOne extends ConsumerWidget {
+//   const ChildOne({super.key});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     return ElevatedButton(onPressed: (){
+//       ref.read(testProvider.notifier).update(21);
+//     }, child: Text("Child 1 Update"));
+//   }
+// }
+// class ChildTwo extends ConsumerWidget {
+//   const ChildTwo({super.key});
+
+//   @override
+//   Widget build(BuildContext context, WidgetRef ref) {
+//     final age = ref.watch(testProvider);
+//     return Text(age.age?.toString() ?? 'Null');
+//   }
+// }
+
+
+// final testProvider = StateNotifierProvider<TestProviderNotifier, TestProviderState>((ref) =>TestProviderNotifier());
+
+// class TestProviderNotifier extends StateNotifier<TestProviderState> {
+//   TestProviderNotifier() : super(TestProviderState(null));
+//   update(int value){
+//     state = state.copyWith(age: value);
+//   }
+// }
+
+// class TestProviderState {
+//   final int? age;
+//   TestProviderState(this.age);
+
+//   TestProviderState copyWith({int? age}){
+//     return TestProviderState(age ?? this.age);
+//   }  
+// }

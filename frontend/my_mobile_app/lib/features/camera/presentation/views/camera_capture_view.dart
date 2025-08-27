@@ -1,118 +1,194 @@
-import 'dart:io';
-import 'package:camera/camera.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_mobile_app/features/task/presentation/provider/complete_params_provider.dart';
+// import 'dart:io';
+// import 'package:camera/camera.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
+// import 'package:my_mobile_app/core/services/camera_services.dart';
+// import 'package:my_mobile_app/features/task/presentation/provider/complete_params_provider.dart';
 
-class CameraCaptureView extends ConsumerStatefulWidget {
-  const CameraCaptureView({super.key});
+// class CameraCaptureView extends ConsumerStatefulWidget {
+//   const CameraCaptureView({super.key});
 
-  @override
-  ConsumerState<CameraCaptureView> createState() => _CameraCaptureViewState();
-}
+//   @override
+//   ConsumerState<CameraCaptureView> createState() => _CameraCaptureViewState();
+// }
 
-class _CameraCaptureViewState extends ConsumerState<CameraCaptureView> {
-  CameraController? _controller;
-  bool _isCameraReady = false;
-  XFile? _capturedImage;
+// class _CameraCaptureViewState extends ConsumerState<CameraCaptureView> {
 
-  @override
-  void initState() {
-    super.initState();
-    _initializeCamera();
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     WidgetsBinding.instance.addPostFrameCallback((_) async {
+//       await _cameraService.initialize();
+//       setState(() {});
+//     });
+//   }
 
-  @override
-  void dispose() {
-    _controller?.dispose();
-    super.dispose();
-  }
+//   imageDoneProcessToNextStep() async {
+//     _cameraService.captureImage().then((XFile image) {
+//       ref
+//           .read(taskCompletingParamsProvider.notifier)
+//           .updateImage(File(image.path));
+//     });
+//   }
 
-  Future<void> _initializeCamera() async {
-    try {
-      final cameras = await availableCameras();
-      final frontCamera = cameras.firstWhere(
-        (c) => c.lensDirection == CameraLensDirection.front,
-        orElse: () => cameras.first,
-      );
+//   @override
+//   Widget build(BuildContext context) {
+//     print(_cameraService.controller);
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('Capture Image'),
+//         actions: [
+//           if (_cameraService.capturedImage != null)
+//             IconButton(
+//               icon: const Icon(Icons.done),
+//               onPressed: () => imageDoneProcessToNextStep(),
+//             ),
+//         ],
+//       ),
+//       body: _cameraService.errorMessage != null
+//           ? Center(
+//               child: Text(
+//                 _cameraService.errorMessage!,
+//                 style: TextStyle(color: Colors.red),
+//               ),
+//             )
+//           : _cameraService.controller != null
+//               ? Stack(
+//                   children: [
+//                     _cameraService.capturedImage == null
+//                         ? CameraPreview(_cameraService.controller!)
+//                         : Center(
+//                             child: Image.file(
+//                                 File(_cameraService.capturedImage!.path))),
+//                     // if (_showFlashEffect)
+//                     //   AnimatedOpacity(
+//                     //     opacity: _showFlashEffect ? 1 : 0,
+//                     //     duration: const Duration(milliseconds: 300),
+//                     //     child: Container(
+//                     //       color: Colors.white.withValues(alpha: 0.8),
+//                     //       width: double.infinity,
+//                     //       height: double.infinity,
+//                     //     ),
+//                     //   ),
+//                     Positioned(
+//                       bottom: 20,
+//                       right: 20,
+//                       child: FloatingActionButton(
+//                         onPressed: _cameraService.capturedImage == null
+//                             ? () async {
+//                                 await _cameraService.captureImage();
+//                                 setState(() {});
+//                               }
+//                             : _retakeImage,
+//                         child: Icon(_cameraService.capturedImage == null
+//                             ? Icons.camera
+//                             : Icons.refresh),
+//                       ),
+//                     ),
+//                   ],
+//                 )
+//               : const Center(child: CircularProgressIndicator()),
+//     );
+//   }
 
-      _controller = CameraController(
-        frontCamera,
-        ResolutionPreset.medium,
-        enableAudio: false, // 🔇 Audio disabled
-      );
+//   @override
+//   void dispose() {
+//     _cameraService.dispose();
+//     super.dispose();
+//   }
 
-      await _controller!.initialize();
-      if (mounted) {
-        setState(() => _isCameraReady = true);
-      }
-    } catch (e) {
-      _showSnackBar('Camera error: $e');
-    }
-  }
+//   void _retakeImage() {
+//     setState(() => _cameraService.clearImage());
+//   }
+// }
 
-  Future<void> _captureImage() async {
-    if (!_isCameraReady || _controller == null) return;
+// import 'dart:io';
+// import 'package:camera/camera.dart';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:my_mobile_app/features/camera/presentation/provider/image_capture_provider.dart';
+// class CameraCaptureView extends ConsumerStatefulWidget {
+//   const CameraCaptureView({super.key});
 
-    try {
-      final image = await _controller!.takePicture();
-      final imageFile = File(image.path);
-      final sizeInKB = (await imageFile.length()) / 1024;
+//   @override
+//   ConsumerState<CameraCaptureView> createState() => _CameraCaptureViewState();
+// }
 
-      if (mounted) {
-        setState(() {
-          _capturedImage = image;
-          // ref.read(taskCompleteParamsProvider.notifier).state =
-          //     ref.read(taskCompleteParamsProvider.notifier).state.copyWith(
-          //           image: imageFile,
-          //         );
-          ref.read(taskCompletingParamsProvider.notifier).updateImage(imageFile);
-        });
+// class _CameraCaptureViewState extends ConsumerState<CameraCaptureView> {
+//   bool _isInitialized = false;
 
-        _showSnackBar('Image captured (${sizeInKB.toStringAsFixed(1)} KB)');
-      }
-    } catch (e) {
-      _showSnackBar('Capture failed: $e');
-    }
-  }
+//   @override
+//   void didChangeDependencies() {
+//     super.didChangeDependencies();
 
-  void _retakePicture() {
-    setState(() => _capturedImage = null);
-  }
+//     // Initialize camera only once
+//     if (!_isInitialized) {
+//       final ctrl = ref.read(imageCaptureProvider.notifier);
+//       ctrl.initializeCamera();
+//       _isInitialized = true;
+//     }
+//   }
 
-  void _showSnackBar(String message) {
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
+//   @override
+//   Widget build(BuildContext context) {
+//     final state = ref.watch(imageCaptureProvider);
+//     final ctrl = ref.read(imageCaptureProvider.notifier);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Capture Image')),
-      body: _isCameraReady
-          ? Stack(
-              children: [
-                _capturedImage == null
-                    ? CameraPreview(_controller!)
-                    : Center(child: Image.file(File(_capturedImage!.path))),
-                Positioned(
-                  bottom: 20,
-                  right: 20,
-                  child: FloatingActionButton(
-                    onPressed:
-                        _capturedImage == null ? _captureImage : _retakePicture,
-                    child: Icon(
-                        _capturedImage == null ? Icons.camera : Icons.refresh),
-                  ),
-                ),
-              ],
-            )
-          : const Center(child: CircularProgressIndicator()),
-    );
-  }
-}
+//     if (state.controller == null || !state.controller!.value.isInitialized) {
+//       return const Scaffold(
+//         body: Center(child: CircularProgressIndicator()),
+//       );
+//     }
+
+//     return Scaffold(
+//       appBar: AppBar(title: const Text('Camera View'), actions: [
+//         ElevatedButton(onPressed: () async {
+//           await ctrl.closedCameraStream();
+//         }, child: Text("Close"))
+//       ],),
+//       body: Stack(
+//         children: [
+//           state.imageFile == null
+//               ? Stack(
+//                   children: [
+//                     CameraPreview(state.controller!),
+//                     Align(
+//                       alignment: Alignment.bottomCenter,
+//                       child: Container(
+//                         color: Colors.black54,
+//                         padding: const EdgeInsets.all(16),
+//                         child: Text(
+//                           state.conditionText ?? 'Hold still...',
+//                           style: const TextStyle(
+//                             color: Colors.white,
+//                             fontSize: 20,
+//                           ),
+//                         ),
+//                       ),
+//                     )
+//                   ],
+//                 )
+//               : Center(
+//                   child: Image.file(
+//                     File(state.imageFile!.path),
+//                     fit: BoxFit.cover,
+//                   ),
+//                 ),
+//           Positioned(
+//             bottom: 20,
+//             right: 20,
+//             child: FloatingActionButton(
+//               onPressed: state.imageFile == null
+//                   ? ctrl.startDetection
+//                   : ctrl.clearImage,
+//               child: Icon(
+//                 state.imageFile == null ? Icons.camera : Icons.refresh,
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

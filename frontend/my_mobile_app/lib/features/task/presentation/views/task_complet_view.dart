@@ -4,9 +4,13 @@ import 'package:my_mobile_app/core/widgets/loading_widget.dart';
 import 'package:my_mobile_app/core/widgets/my_button.dart';
 import 'package:my_mobile_app/core/widgets/my_dialog_box.dart';
 import 'package:my_mobile_app/core/widgets/toast_msg_widget.dart';
+import 'package:my_mobile_app/features/devices/presentation/providers/location_provider.dart';
 import 'package:my_mobile_app/features/devices/presentation/providers/permission_provider.dart';
+import 'package:my_mobile_app/features/task/data/models/request/location_params.dart';
+import 'package:my_mobile_app/features/task/data/models/request/task_params.dart';
 import 'package:my_mobile_app/features/task/domain/entities/task_entities.dart';
 import 'package:my_mobile_app/features/task/presentation/provider/complete_params_provider.dart';
+import 'package:my_mobile_app/features/task/presentation/provider/task_check_out_provider.dart';
 import 'package:my_mobile_app/features/task/presentation/provider/task_complete_provider.dart';
 import 'package:my_mobile_app/features/task/presentation/provider/task_read_provider.dart';
 import 'package:my_mobile_app/features/task/presentation/widgets/location_status_section.dart';
@@ -40,12 +44,12 @@ class _TaskCompleteViewState extends ConsumerState<TaskCompleteView> {
   Widget build(BuildContext context) {
     final currentTask = ref.watch(currentTaskProvider);
     print("Task COmplete View Called");
+    
     if (currentTask == null) {
       return const Scaffold(
         body: Center(child: MyLoadingWidget()),
       );
     }
-
     // Watch permission provider
     final permissionsAsync = ref.watch(permissionsProvider);
 
@@ -148,11 +152,46 @@ class _TaskCompleteViewState extends ConsumerState<TaskCompleteView> {
                           _validateAndSubmit(context, innerRef, currentTask),
                     );
                   }),
+                const SizedBox(height: 12),
+                if (currentTask.status != TaskStatus.assigned &&
+                    currentTask.checkIn != null &&
+                    currentTask.checkOut == null &&
+                    !locationDenied)
+                  Consumer(builder: (context, innerRef, _) {
+                    return MyCustomButton(
+                      btnText: 'Checkout',
+                      icon: Icons.logout,
+                      onClick: () async {
+                        await _checkOut(context, innerRef, currentTask);
+                        // innerRef.invalidate(taskListProvider); // refresh tasks
+                      },
+                    );
+                  }),
               ],
             ),
           );
         },
       ),
+    );
+  }
+
+  Future<void> _checkOut(
+      BuildContext context, WidgetRef ref, TaskEntities task) async {
+    final response =
+        await ref.read(taskCompleteCheckoutProvider(task.id ?? '').future);
+    response.fold(
+      (failure) {
+        // handle error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failure.message)),
+        );
+      },
+      (successMessage) {
+        // handle success
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(successMessage)),
+        );
+      },
     );
   }
 

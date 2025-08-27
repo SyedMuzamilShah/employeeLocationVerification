@@ -109,4 +109,28 @@ class AuthRemoteDataSourcesImpl extends AuthRemoteDataSources {
       return Left(Failure(message: err.toString()));
     }
   }
+  
+  @override
+  Future<Either<Failure, String>> changePassword(
+      Map<String, dynamic> prams) async {
+    try {
+      var response = await _apiServices.postRequest(
+          endPoint: ServerUrl.userChangePasswordRoute, body: prams);
+          print("Testing the main portion");
+          print(response.data);
+      if (response.statusCode == 204) {
+        return Right(response.data);
+      } else {
+        return Left(
+            Failure(message: response.data?['message'] ?? 'Request failed'));
+      }
+    } on ApiException catch (err) {
+      if (err is ValidationException) {
+        return Left(ValidationFailure(errors: err.errors, msg: err.message));
+      }
+      return Left(Failure(message: err.message));
+    } catch (err) {
+      return Left(Failure(message: err.toString()));
+    }
+  }
 }

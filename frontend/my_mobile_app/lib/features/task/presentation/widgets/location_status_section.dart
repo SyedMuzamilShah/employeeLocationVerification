@@ -47,7 +47,14 @@ class LocationStatusSection extends ConsumerWidget {
         return _buildLocationBodySection(context, params);
       },
       loading: () => const MyLoadingWidget(color: Colors.black),
-      error: (error, _) => Text("Error: $error"),
+      error: (error, _) => Column(
+        children: [
+          Text("$error"),
+          InkWell(
+            onTap: ()=> ref.invalidate(currentLocationProvider),
+            child: Icon(Icons.refresh))
+        ],
+      ),
     );
   }
 

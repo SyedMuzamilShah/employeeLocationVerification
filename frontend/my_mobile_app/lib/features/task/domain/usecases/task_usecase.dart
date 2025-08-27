@@ -10,6 +10,8 @@ abstract class TaskUseCase {
       [TaskReadParams? params]);
   Future<Either<Failure, TaskCompletedEntities>> completeTask(
       TaskCompletingParams params);
+  Future<Either<Failure, String>> completeTaskCheckOutUseCase(
+      TaskCompletingCheckOutParams params);
 }
 
 class TaskUseCaseImpl extends TaskUseCase {
@@ -29,6 +31,15 @@ class TaskUseCaseImpl extends TaskUseCase {
   Future<Either<Failure, TaskCompletedEntities>> completeTask(
       TaskCompletingParams params) async {
     final response = await _repo.completeTask(params);
+    return response.fold(
+      (err) => Left(err),
+      (succ) => Right(succ),
+    );
+  }
+  
+  @override
+  Future<Either<Failure, String>> completeTaskCheckOutUseCase(TaskCompletingCheckOutParams params) async {
+    final response = await _repo.completeTaskCheckOut(params);
     return response.fold(
       (err) => Left(err),
       (succ) => Right(succ),

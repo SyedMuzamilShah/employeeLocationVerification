@@ -15,9 +15,11 @@ import 'package:my_mobile_app/core/services/api_services.dart';
 import 'package:my_mobile_app/core/services/local_database_service.dart';
 import 'package:my_mobile_app/core/services/token_service.dart';
 
+
+
 /// **StateNotifierProvider for Authentication**
 final basicAuthProvider =
-    StateNotifierProvider<BasicAuthProviderNotifier, BasicAuthProviderState>(
+    StateNotifierProvider.autoDispose<BasicAuthProviderNotifier, BasicAuthProviderState>(
   (ref) => BasicAuthProviderNotifier(),
 );
 

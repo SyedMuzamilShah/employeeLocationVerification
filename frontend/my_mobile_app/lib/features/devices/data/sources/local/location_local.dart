@@ -23,6 +23,12 @@ class LocationLocalDataSourceImpl implements LocationLocalDataSource {
   Future<Either<Failure, LocationData>> getCurrentLocation() async {
     try {
        final response = await location.getCurrentLocation();
+       if (response.isMock != null) {
+        if (response.isMock!){
+         print('Warning: Mock location detected');
+          Left(Failure(message: "Pack location detected"));
+        }
+       }
        return Right(response);
     }catch (e) {
       return Left(Failure(message: e.toString()));

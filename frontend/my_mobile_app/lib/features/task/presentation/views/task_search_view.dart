@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_mobile_app/features/task/data/models/request/task_params.dart';
 import 'package:my_mobile_app/features/task/domain/entities/task_entities.dart';
 import 'package:my_mobile_app/features/task/presentation/provider/task_read_provider.dart';
 import 'package:my_mobile_app/features/task/presentation/provider/task_search_provider.dart';
 import 'package:intl/intl.dart';
+import 'package:my_mobile_app/features/task/presentation/views/task_complet_view.dart';
+import 'package:my_mobile_app/features/task/presentation/widgets/task_card.dart';
 
 class TaskSearchView extends ConsumerWidget {
   const TaskSearchView({super.key});
@@ -17,6 +18,7 @@ class TaskSearchView extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search Tasks'),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -58,7 +60,8 @@ class _SearchField extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final searchText = ref.watch(taskSearchProvider.select((value) => value.search));
+    var searchText =
+        ref.read(taskSearchProvider.select((value) => value.search));
 
     return TextField(
       decoration: InputDecoration(
@@ -93,11 +96,12 @@ class _StatusFilter extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentStatus = ref.watch(taskSearchProvider.select((value) => value.status));
+    final currentStatus =
+        ref.read(taskSearchProvider.select((value) => value.status));
     // final theme = Theme.of(context);
 
-    return DropdownButtonFormField<String>(
-      value: currentStatus?.name,
+    return DropdownButtonFormField<TaskStatus>(
+      value: currentStatus,
       decoration: InputDecoration(
         labelText: 'Filter by status',
         border: OutlineInputBorder(
@@ -111,13 +115,13 @@ class _StatusFilter extends ConsumerWidget {
         ),
         ...TaskStatus.values.map((status) {
           return DropdownMenuItem(
-            value: status.name,
+            value: status,
             child: Text(status.name.toUpperCase()),
           );
-        }).toList(),
+        }),
       ],
       onChanged: (value) {
-        // ref.read(taskSearchProvider.notifier).updateStatus(value);
+        ref.read(taskSearchProvider.notifier).updateStatus(value);
         ref.invalidate(taskListProvider);
       },
     );
@@ -131,7 +135,8 @@ class _DateFilter extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final selectedDate = ref.watch(taskSearchProvider.select((value) => value.dueDate));
+    final selectedDate =
+        ref.watch(taskSearchProvider.select((value) => value.dueDate));
     // final theme = Theme.of(context);
 
     return Row(
@@ -146,7 +151,9 @@ class _DateFilter extends ConsumerWidget {
                   ? IconButton(
                       icon: const Icon(Icons.clear),
                       onPressed: () {
-                        ref.read(taskSearchProvider.notifier).updateDueDate(null);
+                        ref
+                            .read(taskSearchProvider.notifier)
+                            .updateDueDate(null);
                         ref.invalidate(taskListProvider);
                       },
                     )
@@ -180,15 +187,13 @@ class _DateFilter extends ConsumerWidget {
 }
 
 class _TaskResultsList extends ConsumerWidget {
-  // final TaskReadParams searchParams;
-
-  // const _TaskResultsList({required this.searchParams});
   const _TaskResultsList();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchParams = ref.watch(taskSearchProvider);
     final tasksAsync = ref.watch(taskListProvider(searchParams));
+
     return tasksAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => Center(
@@ -201,22 +206,22 @@ class _TaskResultsList extends ConsumerWidget {
           );
         }
 
-        return ListView.builder(
+        return ListView.separated(
+          padding: const EdgeInsets.all(12),
           itemCount: tasks.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 8),
           itemBuilder: (context, index) {
             final task = tasks[index];
-            return ListTile(
-              title: Text(task.title ?? 'No Title'),
-              subtitle: Text(DateFormat('MMM dd, yyyy').format(task.dueDate ?? DateTime.now())),
-              trailing: Chip(
-                label: Text(task.status?.name.toUpperCase() ?? 'Unknown'),
-                backgroundColor: task.status == TaskStatus.completed
-                    ? Colors.green.shade100
-                    : task.status == TaskStatus.submitted
-                        ? Colors.orange.shade100
-                        : Colors.red.shade100,
-              ),
-            );
+            return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TaskCompleteView(task: task),
+                    ),
+                  );
+                },
+                child: TaskCard(task: task));
           },
         );
       },

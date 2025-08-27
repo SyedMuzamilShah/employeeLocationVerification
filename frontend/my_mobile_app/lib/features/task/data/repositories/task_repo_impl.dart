@@ -65,4 +65,14 @@ class TaskRepoImpl extends TaskRepo {
       return Right(TaskResponseModel.fromJson(data['data']));
     });
   }
+  
+  @override
+  Future<Either<Failure, String>> completeTaskCheckOut(TaskCompletingCheckOutParams params) async {
+    final response = await _dataSources.completingTaskCheckout(params.toJson());
+    return response.fold((err) {
+      return Left(err);
+    }, (succ) {
+      return Right('Checkout successfully');
+    });
+  }
 }

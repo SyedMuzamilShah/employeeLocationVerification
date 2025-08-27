@@ -1,14 +1,17 @@
-// 4. Change Password Screen
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_mobile_app/core/widgets/my_button.dart';
+import 'package:my_mobile_app/features/auth/data/models/request/change_password_params.dart';
+import 'package:my_mobile_app/features/auth/presentation/providers/change_password_provider.dart';
 
-class ChangePasswordView extends StatefulWidget {
+class ChangePasswordView extends ConsumerStatefulWidget {
   const ChangePasswordView({super.key});
 
   @override
-  State<ChangePasswordView> createState() => _ChangePasswordViewState();
+  ConsumerState<ChangePasswordView> createState() => _ChangePasswordViewState();
 }
 
-class _ChangePasswordViewState extends State<ChangePasswordView> {
+class _ChangePasswordViewState extends ConsumerState<ChangePasswordView> {
   final _formKey = GlobalKey<FormState>();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -25,13 +28,42 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
     super.dispose();
   }
 
-  void _submitForm() {
+  void _submitForm() async {
     if (_formKey.currentState!.validate()) {
-      // Implement password change logic
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password changed successfully')),
+      final params = ChangePasswordParams(
+        oldPassword: _currentPasswordController.text.trim(),
+        newPassword: _newPasswordController.text.trim(),
       );
-      Navigator.pop(context);
+
+      final asyncValue = await ref.read(changePasswordProvider(params).future);
+
+      asyncValue.fold(
+        (failure) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                backgroundColor: Theme.of(context).cardColor,
+                content: Center(
+                    child: Text(
+                  'Failed: ${failure.message}',
+                  style: TextStyle(color: Colors.red),
+                ))),
+          );
+        },
+        (success) {
+                  _currentPasswordController.clear();
+        _newPasswordController.clear();
+        _confirmPasswordController.clear();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+                backgroundColor: Theme.of(context).cardColor,
+                content: Center(
+                    child: Text(
+                  success,
+                  style: TextStyle(color: Colors.green),
+                ))),
+          );
+        },
+      );
     }
   }
 
@@ -39,56 +71,55 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Change Password"),
+        title: Text('Change password'),
+        centerTitle: true,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16),
+      body: SafeArea(
         child: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            _buildPasswordField(
-              controller: _currentPasswordController,
-              label: 'Current Password',
-              obscureText: _obscureCurrentPassword,
-              onToggleVisibility: () => setState(
-                  () => _obscureCurrentPassword = !_obscureCurrentPassword),
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              children: [
+                _buildPasswordField(
+                  controller: _currentPasswordController,
+                  label: 'Current Password',
+                  obscureText: _obscureCurrentPassword,
+                  onToggleVisibility: () => setState(
+                      () => _obscureCurrentPassword = !_obscureCurrentPassword),
+                ),
+                const SizedBox(height: 16),
+                _buildPasswordField(
+                  controller: _newPasswordController,
+                  label: 'New Password',
+                  obscureText: _obscureNewPassword,
+                  onToggleVisibility: () =>
+                      setState(() => _obscureNewPassword = !_obscureNewPassword),
+                ),
+                const SizedBox(height: 16),
+                _buildPasswordField(
+                  controller: _confirmPasswordController,
+                  label: 'Confirm New Password',
+                  obscureText: _obscureConfirmPassword,
+                  onToggleVisibility: () => setState(
+                      () => _obscureConfirmPassword = !_obscureConfirmPassword),
+                  validator: (value) {
+                    if (value != _newPasswordController.text) {
+                      return 'Passwords do not match';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 24),
+                MyCustomButton(
+                  btnText: 'Change password',
+                  onClick: _submitForm,
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
-            _buildPasswordField(
-              controller: _newPasswordController,
-              label: 'New Password',
-              obscureText: _obscureNewPassword,
-              onToggleVisibility: () =>
-                  setState(() => _obscureNewPassword = !_obscureNewPassword),
-            ),
-            const SizedBox(height: 16),
-            _buildPasswordField(
-              controller: _confirmPasswordController,
-              label: 'Confirm New Password',
-              obscureText: _obscureConfirmPassword,
-              onToggleVisibility: () => setState(
-                  () => _obscureConfirmPassword = !_obscureConfirmPassword),
-              validator: (value) {
-                if (value != _newPasswordController.text) {
-                  return 'Passwords do not match';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _submitForm,
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-              ),
-              child: const Text('Change Password'),
-            ),
-          ],
+          ),
         ),
-            ),
       ),
-    floatingActionButton: FloatingActionButton(onPressed: (){}, child: Icon(Icons.save),),
     );
   }
 
@@ -109,7 +140,7 @@ class _ChangePasswordViewState extends State<ChangePasswordView> {
         ),
         suffixIcon: IconButton(
           icon: Icon(
-            obscureText ? Icons.visibility : Icons.visibility_off,
+            obscureText ? Icons.visibility_off : Icons.visibility,
           ),
           onPressed: onToggleVisibility,
         ),

@@ -1,25 +1,11 @@
 import 'dart:async';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_mobile_app/features/task/data/models/request/location_params.dart';
 import 'package:my_mobile_app/features/task/data/models/request/task_params.dart';
 import 'package:my_mobile_app/features/task/domain/provider/use_case_provider.dart';
 import 'package:my_mobile_app/features/task/domain/usecases/task_usecase.dart';
 import 'package:my_mobile_app/features/task/presentation/provider/complete_params_provider.dart';
 import 'package:my_mobile_app/features/task/presentation/provider/task_read_provider.dart';
-
-// // Provider for task completion params
-// final taskCompleteParamsProvider = StateProvider.autoDispose<TaskCompletingParams>((ref) {
-//   return TaskCompletingParams(
-//     taskAssignmentId: '',
-//     currentTime: DateTime.now(),
-//     image: null,
-//     location: LocationParams(
-//       latitude: 0.0,
-//       longitude: 0.0,
-//     ),
-//   );
-// });
 
 
 // Provider for task completion state

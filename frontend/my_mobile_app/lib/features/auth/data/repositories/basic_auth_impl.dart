@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:my_mobile_app/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:my_mobile_app/features/auth/data/datasources/auth_remote.dart';
+import 'package:my_mobile_app/features/auth/data/models/request/change_password_params.dart';
 import 'package:my_mobile_app/features/auth/data/models/request/login_params.dart';
 import 'package:my_mobile_app/features/auth/data/models/request/register_params.dart';
 import 'package:my_mobile_app/features/auth/data/models/response/token_response_model.dart';
@@ -16,7 +17,8 @@ class AuthRepoImpl
         RegisterRepository,
         LoginRepository,
         LogoutRepository,
-        UserRepository {
+        UserRepository,
+        ChangePasswordRepository {
   final AuthLocalDataSource _localDataSource;
   final AuthRemoteDataSources _remoteDataSource;
   final NetworkInfo _networkInfo;
@@ -166,5 +168,26 @@ class AuthRepoImpl
       await _localDataSource.cacheToken(tk);
       return Right(true);
     });
+  }
+  
+  @override
+  Future<Either<Failure, String>> changePassword(
+      ChangePasswordParams params) async {
+    if (!await _networkInfo.isConnected) {
+      return Left(NetworkFailure(message: 'No internet connection'));
+    }
+
+    try {
+      final response = await _remoteDataSource.changePassword(params.toJson());
+
+      return response.fold((err) {
+        return Left(err);
+      }, (data) async {
+        print("FROM here Every thing is fine");
+        return Right("Password change successfully");
+      });
+    } catch (e) {
+      return Left(Failure(message: 'failed to change: ${e.toString()}'));
+    }
   }
 }

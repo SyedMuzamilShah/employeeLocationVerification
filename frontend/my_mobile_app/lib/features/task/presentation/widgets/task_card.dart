@@ -10,7 +10,8 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dueDate = DateFormat('MMM dd, yyyy - hh:mm a').format(task.dueDate ?? DateTime.now());
+    final dueDate = DateFormat('MMM dd, yyyy - hh:mm a')
+        .format(task.dueDate ?? DateTime.now());
 
     return Card(
       elevation: 0.5,
@@ -55,6 +56,13 @@ class TaskCard extends StatelessWidget {
                 ),
               ],
             ),
+                          
+            checkInOutSeaction(task.checkIn != null, task.checkOut != null),
+            
+
+            
+            
+            
             if (task.description?.isNotEmpty ?? false) ...[
               const SizedBox(height: 8),
               Text(
@@ -83,6 +91,10 @@ class _TaskStatusBadge extends StatelessWidget {
     Color textColor;
 
     switch (status) {
+      case TaskStatus.verified:
+        backgroundColor = Colors.green.shade100;
+        textColor = Colors.green.shade800;
+        break;
       case TaskStatus.completed:
         backgroundColor = Colors.green.shade100;
         textColor = Colors.green.shade800;
@@ -118,4 +130,36 @@ class _TaskStatusBadge extends StatelessWidget {
       ),
     );
   }
+}
+
+
+
+Widget checkInOutSeaction (bool checkIn, bool checkOut) {
+  return Row(
+  children: [
+    Row(
+      children: [
+        Icon(
+          checkIn ? Icons.check_circle : Icons.radio_button_unchecked,
+          color: checkIn ? Colors.green : Colors.orange,
+          size: 18,
+        ),
+        SizedBox(width: 4),
+        Text("In", style: TextStyle(fontSize: 12)),
+      ],
+    ),
+    SizedBox(width: 12),
+    Row(
+      children: [
+        Icon(
+          checkOut ? Icons.check_circle : Icons.radio_button_unchecked,
+          color: checkOut ? Colors.green : Colors.red,
+          size: 18,
+        ),
+        SizedBox(width: 4),
+        Text("Out", style: TextStyle(fontSize: 12)),
+      ],
+    ),
+  ],
+);
 }

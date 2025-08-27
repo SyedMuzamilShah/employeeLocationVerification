@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:my_mobile_app/features/auth/presentation/views/change_password_view.dart';
 import 'package:my_mobile_app/features/auth/presentation/views/login_view.dart';
 import 'package:my_mobile_app/features/auth/presentation/views/register_view.dart';
+import 'package:my_mobile_app/features/camera/presentation/views/camera_capture_view.dart';
 import 'package:my_mobile_app/features/profile/presentation/views/profile_view.dart';
 import 'package:my_mobile_app/features/home/presentation/views/home_view.dart';
 import 'package:my_mobile_app/features/splash/presentation/views/splash_view.dart';
+import 'package:my_mobile_app/features/testing_view.dart';
 
 class AppRoutes {
   static const String testing = '/testing';
@@ -24,7 +26,8 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => SplashView());
 
       case testing:
-        return MaterialPageRoute(builder: (_) => Container());
+        // return MaterialPageRoute(builder: (_) => CameraCaptureView());
+        return MaterialPageRoute(builder: (_) => TestingView());
       // return MaterialPageRoute(builder: (_) => LocationCameraView());
       // return MaterialPageRoute(builder: (_) => PayrollPage());
       //   // return MaterialPageRoute(builder: (_) => MyTaskView());

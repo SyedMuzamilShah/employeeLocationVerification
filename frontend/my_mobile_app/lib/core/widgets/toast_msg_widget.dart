@@ -7,7 +7,7 @@ showToastMessage(String message, [bool success = true]) {
   Color bgColor = success ? Colors.green : Colors.red;
   return Fluttertoast.showToast(
       msg: message,
-      toastLength: Toast.LENGTH_SHORT,
+      toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.CENTER,
       timeInSecForIosWeb: 1,
       backgroundColor: bgColor,

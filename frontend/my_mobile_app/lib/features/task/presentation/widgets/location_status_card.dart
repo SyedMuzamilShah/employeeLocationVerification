@@ -19,7 +19,7 @@ class LocationStatusCard extends StatelessWidget {
     return Card(
       color: isWithinRadius
           // ? theme.colorScheme.secondary.withValues(alpha: 0.5)
-          ? theme.colorScheme.success
+          ? theme.colorScheme.success.withValues(alpha: 0.5)
           : theme.colorScheme.errorContainer.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(16.0),

@@ -9,4 +9,5 @@ abstract class TaskRepo {
   Future<Either<Failure, List<TaskEntities>>> readTask([TaskReadParams? params]);
   Future<Either<Failure, TaskEntities>> getTaskById(TaskGetByIdParams params);
   Future<Either<Failure, TaskCompletedEntities>> completeTask(TaskCompletingParams params);
+  Future<Either<Failure, String>> completeTaskCheckOut(TaskCompletingCheckOutParams params);
 }

@@ -33,6 +33,8 @@ class TaskResponseModel extends TaskEntities {
     super.submittedAt,
     super.submittedLate,
     super.threshold,
+    super.checkIn,
+    super.checkOut,
     super.confidence,
     super.validateMethod,
   });
@@ -61,6 +63,8 @@ class TaskResponseModel extends TaskEntities {
           ? (json['aroundDistanceMeter'] as num).toDouble()
           : null,
       submittedAt: _tryParseDate(json['submittedAt']),
+      checkIn: _tryParseDate(json['checkIn']),
+      checkOut: _tryParseDate(json['checkOut']),
       submittedLate: json['submittedLate'] as bool?,
       threshold: (json['threshold'] is num)
           ? (json['threshold'] as num).toDouble()

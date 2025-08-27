@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:my_mobile_app/features/auth/data/models/request/change_password_params.dart';
 import 'package:my_mobile_app/features/auth/data/models/request/login_params.dart';
 import 'package:my_mobile_app/features/auth/data/models/request/register_params.dart';
 import 'package:my_mobile_app/features/auth/domain/entities/user_entities.dart';
@@ -32,7 +33,7 @@ abstract class UserRefreshToken {
 }
 
 abstract class ChangePasswordRepository {
-  Future<Either<Failure, String>> changePassword();
+  Future<Either<Failure, String>> changePassword(ChangePasswordParams params);
 }
 
 

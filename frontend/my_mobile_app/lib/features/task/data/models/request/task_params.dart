@@ -78,6 +78,40 @@ class TaskCompletingParams extends Equatable {
       [taskAssignmentId, currentTime, image, location];
 }
 
+
+class TaskCompletingCheckOutParams extends Equatable {
+  final String taskAssignmentId;
+  final DateTime currentTime;
+  final LocationParams location;
+  const TaskCompletingCheckOutParams(
+      {required this.taskAssignmentId,
+      required this.currentTime,
+      required this.location,
+      });
+
+  toJson() {
+    return {
+      'taskAssignmentId': taskAssignmentId,
+      'currentTime': currentTime.toIso8601String(),
+      'location': location.toJson()
+    };
+  }
+
+  TaskCompletingCheckOutParams copyWith(
+      {String? taskAssignmentId,
+      DateTime? currentTime,
+      LocationParams? location}) {
+    return TaskCompletingCheckOutParams(
+        taskAssignmentId: taskAssignmentId ?? this.taskAssignmentId,
+        currentTime: currentTime ?? this.currentTime,
+        location: location ?? this.location);
+  }
+  
+  @override
+  List<Object?> get props =>
+      [taskAssignmentId, currentTime, location];
+}
+
 // class LocationModel extends LocationEntities {
 //   LocationModel({
 //     required super.latitude,
@@ -178,7 +212,7 @@ class TaskReadParams extends Equatable {
 
   Map<String, dynamic> toJson() {
     return {
-      if (status != null) 'status': status,
+      if (status != null) 'status': status?.name,
       if (search != null) 'search': search,
       if (dueDate != null) 'dueDate': dueDate!.toIso8601String(),
       if (page != null) 'page': page,

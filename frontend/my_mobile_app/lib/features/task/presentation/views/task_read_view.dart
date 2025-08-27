@@ -28,18 +28,21 @@ class TaskReadView extends ConsumerWidget {
           String message =
               error is Failure ? error.message : 'Failed to load tasks';
           return Center(
-            child: Column(
-              spacing: 10,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(message),
-                MyCustomButton(
-                  btnText: 'Refresh',
-                  onClick: () => ref.invalidate(taskListProvider),
-                  icon: Icons.assignment,
-                )
-              ],
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Column(
+                spacing: 10,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(message),
+                  MyCustomButton(
+                    btnText: 'Refresh',
+                    onClick: () => ref.invalidate(taskListProvider),
+                    icon: Icons.assignment,
+                  )
+                ],
+              ),
             ),
           );
         },

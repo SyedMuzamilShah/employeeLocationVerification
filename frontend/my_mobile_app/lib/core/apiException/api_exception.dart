@@ -6,6 +6,7 @@ class ApiException implements Exception {
 
   factory ApiException.fromDioError(DioException error) {
     print("Type : ${error.type} \t StatusCode : ${error.response?.statusCode}");
+    print(error.response);
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:

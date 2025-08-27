@@ -16,14 +16,17 @@ class LocationService {
   }
 
   Future<LocationData> getCurrentLocation() async {
+    print("Get Location Function called");
     try {
       // Check and request service enablement
       _serviceEnabled = await _location.serviceEnabled();
+      print("Get Location Function called : $_serviceEnabled");
+
       if (!_serviceEnabled) {
-      //   _serviceEnabled = await _location.requestService();
-      //   if (!_serviceEnabled) {
-      //   }
-        throw Exception('Location services are disabled');
+        _serviceEnabled = await _location.requestService();
+        if (!_serviceEnabled) {
+          throw Exception('Location services are disabled');
+        }
       }
 
       // Check and request permissions
