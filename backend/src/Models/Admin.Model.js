@@ -23,9 +23,9 @@ const officerSchema = new Schema(
       required: true,
       select: false
     },
-    phoneNumber: {
-      type: String,
-    },
+    // phoneNumber: {
+    //   type: String,
+    // },
 
     organizationId: {
       type: mongoose.Types.ObjectId,

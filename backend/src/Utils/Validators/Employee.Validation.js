@@ -313,5 +313,35 @@ export const validateEmployeeCompleteTaskRoute = [
         })
 ]
 
+export const validateEmployeeCompleteTaskCheckoutRoute = [
+    
+    body("location")
+        .notEmpty()
+        .withMessage("Location is required")
+        .bail()
+        .custom((value) => {
+            // console.log(value)
+            if (typeof value !== 'object' || value.type !== 'Point' || !Array.isArray(value.coordinates)) {
+                throw new Error("Location must be a GeoJSON Point with coordinates");
+            }
+
+            const [longitude, latitude] = value.coordinates;
+
+            if (typeof longitude !== 'number' || typeof latitude !== 'number') {
+                throw new Error("Coordinates must be numbers");
+            }
+
+            if (longitude < -180 || longitude > 180) {
+                throw new Error("Longitude must be between -180 and 180");
+            }
+
+            if (latitude < -90 || latitude > 90) {
+                throw new Error("Latitude must be between -90 and 90");
+            }
+
+            return true;
+        })
+]
+
 
 export const validateEmployeeAssignTaskReadRoute = []

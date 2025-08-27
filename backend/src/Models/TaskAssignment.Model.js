@@ -2,7 +2,7 @@ import mongoose, { Schema, model } from "mongoose";
 
 export const taskAssignmentStatus = {
     ASSIGNED: "ASSIGNED",
-    SUBMITTED : "SUBMITTED",
+    SUBMITTED: "SUBMITTED",
     // INPROGRESS: "INPROGRESS",
     // COMPLETED: "COMPLETED",
     VERIFIED: "VERIFIED",
@@ -10,8 +10,8 @@ export const taskAssignmentStatus = {
 };
 
 export const taskAssignmentValidateMethod = {
-    AUTO : "AUTO",
-    MANAULLY : "MANAULLY"
+    AUTO: "AUTO",
+    MANAULLY: "MANAULLY"
 }
 
 const taskAssignmentSchema = new Schema(
@@ -21,25 +21,25 @@ const taskAssignmentSchema = new Schema(
             ref: 'task',
             required: true
         },
-        faceVerification : {
+        faceVerification: {
             type: Boolean,
-            default : true
+            default: true
         },
-        confidence : {
+        confidence: {
             type: Number,
         },
-        threshold : {
-            type:Number,
+        threshold: {
+            type: Number,
         },
-        validateMethod : {
+        validateMethod: {
             type: String,
             enum: Object.values(taskAssignmentValidateMethod)
         },
-        submittedLate : {
-            type : Boolean
+        submittedLate: {
+            type: Boolean
         },
-        submittedAt : {
-            type : Date
+        submittedAt: {
+            type: Date
         },
         employeeId: {
             type: mongoose.Types.ObjectId,
@@ -51,23 +51,35 @@ const taskAssignmentSchema = new Schema(
             ref: 'Admin',
             required: true
         },
-        pictureAllowed : {
-            type : Boolean,
-            default : false
+        pictureAllowed: {
+            type: Boolean,
+            default: false
         },
-        employeeImage : {
-            type : String
+        employeeImage: {
+            type: String
         },
         employeeLocation: {
             type: { type: String, default: "Point" },
             coordinates: [Number],  // [longitude, latitude]
-            address : String
+            address: String
         },
         status: {
             type: String,
             enum: Object.values(taskAssignmentStatus),
             default: taskAssignmentStatus.ASSIGNED,
             // lowercase: true,
+        },
+
+        employeeCheckoutLocation: {
+            type: { type: String, default: "Point" },
+            coordinates: [Number],  // [longitude, latitude]
+            address: String
+        },
+        checkIn: {
+            type: Date
+        },
+        checkOut: {
+            type: Date
         },
         deadline: {
             type: Date
@@ -76,9 +88,9 @@ const taskAssignmentSchema = new Schema(
     timestamps: true,
     toJSON: {
         virtuals: true,
-        transform: function(doc, ret) {
-          delete ret.__v;
-          return ret;
+        transform: function (doc, ret) {
+            delete ret.__v;
+            return ret;
         }
     },
 }

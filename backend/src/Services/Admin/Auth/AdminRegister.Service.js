@@ -9,7 +9,8 @@ import { ErrorResponse } from "../../../Utils/Error.js";
 */
 
 export const adminRegisterService = async (dataObject) => {
-    const { name, userName, email, password, phoneNumber } = dataObject;
+    // phoneNumber remove
+    const { name, userName, email, password } = dataObject;
 
     try {
         const existingUser = await adminModel.findOne({ email })
@@ -28,7 +29,7 @@ export const adminRegisterService = async (dataObject) => {
             userName,
             email,
             password,  // Password will be hashed by model pre-save hook
-            phoneNumber,
+            // phoneNumber,
         })
 
         // Generate auth tokens

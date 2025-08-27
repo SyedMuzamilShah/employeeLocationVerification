@@ -1,6 +1,10 @@
 import { body } from 'express-validator';
 
 export const validateAdminRegisterRoutes = [
+    body('name')
+    .optional().trim().notEmpty().withMessage('Name is required')
+    .isLength({ min: 3 }).withMessage('Name must be at least 3 characters'),
+    
     body('userName')
     .notEmpty().withMessage('Username is required')
     .isLength({ min: 3 }).withMessage('Username must be at least 3 characters'),
@@ -12,9 +16,9 @@ export const validateAdminRegisterRoutes = [
         
     body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 
-    body('phoneNumber')
-    .optional().trim().notEmpty().withMessage('Phone number field must not be empty')
-    .isLength({min: 10, max: 13}).withMessage('Phone number must be between 10 to 13 characters'),
+    // body('phoneNumber')
+    // .optional().trim().notEmpty().withMessage('Phone number field must not be empty')
+    // .isLength({min: 10, max: 13}).withMessage('Phone number must be between 10 to 13 characters'),
 ];
 
 export const validateAdminLoginRoutes = [

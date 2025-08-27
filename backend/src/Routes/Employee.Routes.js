@@ -2,11 +2,12 @@ import { Router } from "express";
 import { upload } from "../Middlewares/Multer.Middleware.js";
 import { validateHandler } from "../Utils/ValidateHandler.js";
 import { employeeJWTDecode } from "../Middlewares/EmployeeJwt.Middleware.js";
-import { validateEmployeeAssignTaskReadRoute, validateEmployeeChangePasswordRoutes, validateEmployeeCompleteTaskRoute, validateEmployeeForgetPasswordRoutes, validateEmployeeGetRoutes, validateEmployeeImageUploadRoute, validateEmployeeLoginRoutes, validateEmployeeRegisterRoutes } from "../Utils/Validators/Employee.Validation.js";
+import { validateEmployeeAssignTaskReadRoute, validateEmployeeChangePasswordRoutes, validateEmployeeCompleteTaskCheckoutRoute, validateEmployeeCompleteTaskRoute, validateEmployeeForgetPasswordRoutes, validateEmployeeGetRoutes, validateEmployeeImageUploadRoute, validateEmployeeLoginRoutes, validateEmployeeRegisterRoutes } from "../Utils/Validators/Employee.Validation.js";
 import { employeeChangePasswordController, employeeForgotPasswordController, employeeImageUploadController, employeeLoginController, employeeLogoutController, employeeProfileGetController, employeeRegisterController } from "../Controllers/Employee/Employee.Controllers.js";
 import { completedTask } from "../Controllers/Admin/Task.Controllers.js";
-import { employeeAssignedTaskRead, employeeCompletedTaskController } from "../Controllers/Employee/EmployeeManagment.Controllers.js"
+import { employeeAssignedTaskRead, employeeCompletedTaskCheckoutController, employeeCompletedTaskController } from "../Controllers/Employee/EmployeeManagment.Controllers.js"
 import { validateEmployeeRegisterRoutesForEmployee } from "../Utils/Validators/Employee/Employee.Validate.js";
+import { taskAssignmentModel } from "../Models/TaskAssignment.Model.js";
 const employeeRoutes = Router();
 
 // ----------------------- Employee Auths Routes -----------------------
@@ -48,7 +49,10 @@ employeeRoutes.route("/upload-image")
 //   .get(employeeJWTDecode, (req, res, next) => res.send("Employees Get"))
 
 employeeRoutes.route("/task/assign-task-read")
-  .get(employeeJWTDecode, validateEmployeeAssignTaskReadRoute, validateHandler, employeeAssignedTaskRead)
+  .get(employeeJWTDecode, (req,res,next)=>{
+    console.log("Request Response")
+    next()
+  }, validateEmployeeAssignTaskReadRoute, validateHandler, employeeAssignedTaskRead)
 
 
 employeeRoutes.route("/task/completed")
@@ -75,6 +79,43 @@ employeeRoutes.route("/task/completed")
     employeeCompletedTaskController
   );
 
+employeeRoutes.route("/task/completed-checkout")
+  .post(
+    employeeJWTDecode,
+    validateEmployeeCompleteTaskCheckoutRoute,
+    validateHandler,
+    employeeCompletedTaskCheckoutController
+  );
 
+
+employeeRoutes.route("/task/completed-checkout-test").post(
+employeeJWTDecode,
+async (req, res, next) => {
+  try {
+    const employeeId = req.user._id;
+    const { taskAssignmentId } = req.body;
+
+    const taskAssignment = await taskAssignmentModel.findOne({
+      employeeId,
+      _id: taskAssignmentId,
+    });
+
+    if (!taskAssignment) {
+      return res.status(404).json({ message: "Task assignment not found." });
+    }
+
+    // taskAssignment.checkOut = new Date().toString();
+    taskAssignment.checkOut = new Date();
+    await taskAssignment.save();
+
+    res.status(200).json({
+      message: "Check-out time updated successfully.",
+      checkOutTime: taskAssignment.checkOut.toString(),
+    });
+  } catch (error) {
+    next(error); // Pass to Express error handler
+  }
+}
+);
 
 export { employeeRoutes };

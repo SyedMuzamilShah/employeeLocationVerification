@@ -9,7 +9,7 @@ export const employeeJWTDecode = controllerHandler(async (req, _, next) => {
     try {
         // Get access token from web cookies or frontend header
         const token = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
-        console.log(token)
+        // console.log(token)
         // If access token is not present, throw an error
         if (!token) {
             throw new ErrorResponse(STATUS_CODES.UNAUTHORIZED, "Access token is required");

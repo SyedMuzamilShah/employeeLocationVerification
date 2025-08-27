@@ -99,7 +99,7 @@ export const taskUpdateService = async (dataObject) => {
 
 export const taskReadService = async () => {
     try {
-        const tasks = await taskModel.find().sort({ createdAt: -1 }).lean();
+        const tasks = await taskModel.find().sort({ updatedAt: -1 }).lean();
         return { tasks };
     } catch (error) {
         console.error("Error in taskReadService:", error.message);
@@ -168,7 +168,7 @@ export const taskAssignService = async (dataObject) => {
                 taskId,
                 deadline: deadline ?? task.dueDate,
                 pictureAllowed: pictureAllowed,
-                faceVerification : faceVerification
+                faceVerification: faceVerification
             });
 
             newAssignments.push(assignment);
@@ -296,7 +296,7 @@ export const getTasksWithAssignments = async (dataObject) => {
             adminId
         };
 
-        if(taskId){
+        if (taskId) {
             query._id = taskId
         }
         if (status && status.toUpperCase() !== "ALL") {
@@ -310,7 +310,10 @@ export const getTasksWithAssignments = async (dataObject) => {
             ];
         }
 
-        const tasks = await taskModel.find(query).sort({createdAt : -1}).lean();
+        // const tasks = await taskModel.find(query).sort({createdAt : -1}).lean();
+        const tasks = await taskModel.find(query).sort({ updatedAt: -1 }).lean();
+        console.log("Testing the cole function")
+        console.log(tasks)
         const taskIds = tasks.map((task) => task._id);
 
         const assignments = await taskAssignmentModel.find({
@@ -413,10 +416,10 @@ export const getAssignTaskServices = async (dataObject) => {
             {
                 $addFields: {
                     taskLocation: "$task.location", // Flatten the task.location to top level
-                    taskLocationRadius : "$task.aroundDistanceMeter"
+                    taskLocationRadius: "$task.aroundDistanceMeter"
 
                 }
-              },
+            },
             {
                 $project: {
                     _id: 0,
@@ -432,12 +435,14 @@ export const getAssignTaskServices = async (dataObject) => {
                     employeeLocation: 1,
                     confidence: 1,
                     // location: "$task.location",
-                    
+                    checkOut: 1,
+                    checkIn : 1,
+
                     // "task.location": 1,
-                    taskLocation : 1,
-                    taskLocationRadius : 1,
+                    taskLocation: 1,
+                    taskLocationRadius: 1,
                     "employee.email": 1,
-                    "employee._id" : 1,
+                    "employee._id": 1,
                     "employee.userName": 1,
                     "employee.imageUrl": 1
                 }
@@ -445,6 +450,7 @@ export const getAssignTaskServices = async (dataObject) => {
         ];
 
         const result = await taskAssignmentModel.aggregate(pipeline);
+        
         console.log("Result:", result);
         return { assignments: result };
 
@@ -465,39 +471,86 @@ export const getAssignTaskServices = async (dataObject) => {
     }
 };
 
-
 export const taskCompleteService = async (dataObject) => {
     const { employeeId, imageUrl, location, organizationId, taskAssignmentId } = dataObject;
 
     // 1. Validate task assignment
     const taskAssignment = await validateTaskAssignment(employeeId, taskAssignmentId);
-    
+
     // 2. Validate employee
     const employee = await validateEmployee(employeeId);
-    
+
     // 3. Get and validate task details
     const task = await validateTask(taskAssignment.taskId);
-    
+
     // 4. Set submission info
     const { isLate } = setSubmissionInfo(taskAssignment, task.deadline);
-    
+
     // 5. Verify location void function if error throw error
     await verifyLocation(task.location, location, task.aroundDistanceMeter);
-    
+
     // 6. Handle face verification if required
     if (taskAssignment.faceVerification) {
         return await handleFaceVerification(taskAssignment, employee, imageUrl, isLate, location);
     }
 
-    
+
     // 7. If no face verification required, mark as verified
     taskAssignment.employeeLocation = location
     taskAssignment.status = taskAssignmentStatus.VERIFIED;
     taskAssignment.validateMethod = taskAssignmentValidateMethod.AUTO;
-    
+
     await taskAssignment.save();
     return {
         method: taskAssignment.validateMethod, // AUTO
         taskAssignment: taskAssignment
     };
 };
+
+
+export const taskCheckOut = async (dataObject) => {
+    const { employeeId, organizationId, taskAssignmentId, location, currentTime } = dataObject;
+
+    const taskAssignment = await taskAssignmentModel.findOne({
+        employeeId,
+        _id: taskAssignmentId,
+    });
+
+    if (!taskAssignment) {
+        throw new ErrorResponse(STATUS_CODES.NOT_FOUND, "Task Assignment not found");
+    }
+
+    // 3. Get and validate task details
+    const task = await validateTask(taskAssignment.taskId);
+
+    if (!taskAssignment.checkIn) {
+        throw new ErrorResponse(STATUS_CODES.BAD_REQUEST, "Task not checked in");
+    }
+
+
+    // 5. Verify location void function if error throw error
+    await verifyLocation(task.location, location, task.aroundDistanceMeter);
+
+    if (taskAssignment.checkOut) {
+        throw new ErrorResponse(STATUS_CODES.BAD_REQUEST, "Task already checked out");
+    }
+
+
+    console.log(new Date());       // local timezone
+    console.log(new Date().toUTCString()); // UTC
+    console.log(new Date().toISOString()); // ISO 8601 (standard, recommended for DBs)
+    console.log(new Date().toLocaleString()); // ISO 8601 (standard, recommended for DBs)
+    console.log(`pass time ${currentTime}`);
+
+    // taskAssignment.checkOut = currentTime ?? new Date();
+    taskAssignment.checkOut = new Date().toString(); 
+    taskAssignment.employeeCheckoutLocation = location;
+    await taskAssignment.save();
+
+    return {
+        success: true,
+        message: "Task checked out successfully",
+        data: taskAssignment
+    };
+};
+

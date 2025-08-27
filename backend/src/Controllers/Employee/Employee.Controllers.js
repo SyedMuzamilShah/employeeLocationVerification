@@ -7,6 +7,7 @@ import { controllerHandler } from "../../Utils/ControllerHandler.js";
 import { deleteImage } from "../../Utils/DeleteImageFromLocalServer.js"
 import { employeeImageUploadServices } from "../../Services/Employee/Employee.Services.js";
 import { employeeCreateServices, employeeLoginServices, employeeLogOutServices, getEmployeeProfileService } from "../../Services/Employee/Employee.Auth.Services.js";
+import { employeeChangePasswordService } from "../../Services/Admin/Employee/EmployeeAuth.Services.js";
 
 export const employeeRegisterController = controllerHandler(async (req, res) => {
     let imagePath = req.file?.path;
@@ -177,7 +178,34 @@ export const employeeForgotPasswordController = controllerHandler(async (req, re
 });
 
 export const employeeChangePasswordController = controllerHandler(async (req, res) => {
-  res.send("Not Implemented Yet")
+    // Get data from frontend
+    const userId = req.user._id;
+    const dataObject = { userId, ...req.body }
+  
+    try {
+      // Call the change password service
+      const {user} = await employeeChangePasswordService(dataObject);
+  
+      // Return success response
+      return res.status(STATUS_CODES.SUCCESS_NO_RESPONSE).json(
+        new SuccessResponse(
+          STATUS_CODES.SUCCESS_NO_RESPONSE,
+          'Password changed successfully',
+          null
+        ).toJson()
+      );
+    } catch (err) {
+      // Handle specific errors
+      if (err instanceof ErrorResponse) {
+        throw err;
+      }
+  
+      // Handle unexpected errors
+      throw new ErrorResponse(
+        STATUS_CODES.INTERNAL_SERVER_ERROR,
+        'Password change failed due to an unexpected error'
+      );
+    }
 });
 
 

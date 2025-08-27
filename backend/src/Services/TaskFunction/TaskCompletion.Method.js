@@ -51,6 +51,7 @@ export const setSubmissionInfo = (taskAssignment, deadline) => {
     const deadlineDate = new Date(deadline);
     const isLate = submittedAt > deadlineDate;
 
+    taskAssignment.checkIn = submittedAt;
     taskAssignment.submittedAt = submittedAt;
     taskAssignment.submittedLate = isLate;
 

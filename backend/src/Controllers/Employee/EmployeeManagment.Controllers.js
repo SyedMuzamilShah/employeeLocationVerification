@@ -1,7 +1,7 @@
 import { STATUS_CODES } from "../../../constant.js";
 import { taskAssignmentValidateMethod } from "../../Models/TaskAssignment.Model.js";
 import { employeeAssignTaskReadService } from "../../Services/Employee/Employee.Services.js";
-import { taskCompleteService } from "../../Services/Task.Services.js";
+import { taskCheckOut, taskCompleteService } from "../../Services/Task.Services.js";
 import { controllerHandler } from "../../Utils/ControllerHandler.js";
 import { deleteImage } from "../../Utils/DeleteImageFromLocalServer.js";
 import { SuccessResponse } from "../../Utils/Success.js";
@@ -63,3 +63,19 @@ export const employeeCompletedTaskController = controllerHandler(async (req, res
     ).toJson()
   );
 });
+
+
+export const employeeCompletedTaskCheckoutController = controllerHandler(async (req, res) => {
+  const employeeId = req.user._id;
+  const dataObject = { ...req.body, employeeId, ...req.query };
+
+  await taskCheckOut(dataObject);
+
+  return res.status(STATUS_CODES.SUCCESS_NO_RESPONSE).json(
+    new SuccessResponse(
+      STATUS_CODES.SUCCESS_NO_RESPONSE,
+      'Task CheckOut Successful'
+    ).toJson()
+  );
+});
+
