@@ -18,7 +18,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
   late final TextEditingController _phoneController;
-  late final TextEditingController _bioController;
+  // late final TextEditingController _bioController;
   File? _profileImage;
   late UserEntities user;
   @override
@@ -39,7 +39,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
     _nameController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
-    _bioController.dispose();
+    // _bioController.dispose();
     super.dispose();
   }
 
@@ -64,7 +64,7 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
                 radius: 50,
                 backgroundImage: _profileImage != null
                     ? FileImage(_profileImage!)
-                    : const AssetImage('assets/default_avatar.png')
+                    : const AssetImage('assets/avatar.jpg')
                         as ImageProvider,
                 child: const Align(
                   alignment: Alignment.bottomRight,
@@ -88,19 +88,8 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
               icon: Icons.email,
               controller: _emailController,
               keyboardType: TextInputType.emailAddress,
+              readOnly: true
             ),
-            _buildProfileFormField(
-              label: 'Phone Number',
-              icon: Icons.phone,
-              controller: _phoneController,
-              keyboardType: TextInputType.phone,
-            ),
-            // _buildProfileFormField(
-            //   label: 'Bio (Optional)',
-            //   icon: Icons.info,
-            //   controller: _bioController,
-            //   maxLines: 3,
-            // ),
           ],
         ),
       ),
@@ -112,12 +101,14 @@ class _EditProfileViewState extends ConsumerState<EditProfileView> {
     required IconData icon,
     required TextEditingController controller,
     TextInputType keyboardType = TextInputType.text,
+    bool readOnly = false,
     int maxLines = 1,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: TextFormField(
         controller: controller,
+        readOnly: readOnly,
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon),

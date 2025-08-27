@@ -10,7 +10,7 @@ import 'package:my_desktop_app/features/organization/domain/entities/organizatio
 import 'package:my_desktop_app/features/organization/domain/usecases/organization_usecase.dart';
 
 final organizationsLoadProvider =
-    FutureProvider<List<OrganizationEntities>>((ref) async {
+    FutureProvider.autoDispose<List<OrganizationEntities>>((ref) async {
   final organizationNotifier = ref.watch(organizationProvider.notifier);
   return await organizationNotifier.read();
 });
@@ -113,6 +113,7 @@ class OrganizationNotifier extends StateNotifier<OrganizationState> {
   }
 
   Future<void> update({required OrganizationUpdatePrams model}) async {
+    print(model.toJson());
     try {
       state = state.copyWith(isLoading: true, errorMessage: null);
       final response = await _useCase.update(model);

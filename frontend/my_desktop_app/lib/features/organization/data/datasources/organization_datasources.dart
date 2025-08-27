@@ -68,9 +68,9 @@ class OrganizationDatasourcesImpl implements OrganizationDatasources {
   Future<Either<Failure, Map<String, dynamic>>> update(
       {required Map<String, dynamic> prams}) async {
     try {
-      final response = await _api.putRequest(
+      final response = await _api.postRequest(
         endPoint: ServerUrl.userUpdateOrganization,
-        body: prams,
+        queryParameters: prams,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Right(response.data);

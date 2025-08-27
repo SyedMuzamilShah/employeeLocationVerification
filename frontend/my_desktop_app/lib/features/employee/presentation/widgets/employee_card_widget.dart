@@ -24,7 +24,6 @@ class EmployeeCard extends ConsumerWidget {
     final notifier = ref.read(employeeProvider.notifier);
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     return Card(
       color: theme.cardColor,
       elevation: 1,
@@ -41,9 +40,8 @@ class EmployeeCard extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                if(employee.name != null)
                 Text(
-                  employee.name!,
+                  employee.name ?? employee.userName ?? '',
                   style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 EmployeeStatusBadge(status: employee.status.name),

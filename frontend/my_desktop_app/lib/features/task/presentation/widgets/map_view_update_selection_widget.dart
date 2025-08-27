@@ -10,7 +10,8 @@ class MapViewUpdateWidget extends ConsumerStatefulWidget {
   const MapViewUpdateWidget({super.key});
 
   @override
-  ConsumerState<MapViewUpdateWidget> createState() => _MapViewUpdateWidgetState();
+  ConsumerState<MapViewUpdateWidget> createState() =>
+      _MapViewUpdateWidgetState();
 }
 
 class _MapViewUpdateWidgetState extends ConsumerState<MapViewUpdateWidget> {
@@ -31,7 +32,7 @@ class _MapViewUpdateWidgetState extends ConsumerState<MapViewUpdateWidget> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(taskUpdateParamsProvider);
-    
+
     // Move camera to new location when it changes
     if (state.location != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -46,42 +47,45 @@ class _MapViewUpdateWidgetState extends ConsumerState<MapViewUpdateWidget> {
       children: [
         const Text("Tap on the map to select a location"),
         const SizedBox(height: 10),
-        SizedBox(
-          height: 400,
-          child: FlutterMap(
-            mapController: _mapController,
-            options: MapOptions(
-              initialCenter: state.location?.toLatLng() ??
-                  const LatLng(30.1834, 66.9987),
-              initialZoom: 12.0,
-              onTap: (_, latLng) {
-                final current = ref.read(taskCreateParamsProvider.notifier);
-                current.location(LocationModel(
-                    latitude: latLng.latitude,
-                    longitude: latLng.longitude,
-                  ),);
-              },
+        SizedBox(height: 400, child: map(state)),
+      ],
+    );
+  }
+
+  FlutterMap map(state) {
+    return FlutterMap(
+      mapController: _mapController,
+      options: MapOptions(
+        initialCenter:
+            state.location?.toLatLng() ?? const LatLng(30.1834, 66.9987),
+        initialZoom: 12.0,
+        onTap: (_, latLng) {
+          final current = ref.read(taskCreateParamsProvider.notifier);
+          current.location(
+            LocationModel(
+              latitude: latLng.latitude,
+              longitude: latLng.longitude,
             ),
-            children: [
-              TileLayer(
-                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                userAgentPackageName: 'com.example.task_manager',
+          );
+        },
+      ),
+      children: [
+        TileLayer(
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          userAgentPackageName: 'com.example.task_manager',
+        ),
+        if (state.location != null)
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: state.location!.toLatLng(),
+                width: 30,
+                height: 30,
+                child:
+                    const Icon(Icons.location_pin, color: Colors.red, size: 30),
               ),
-              if (state.location != null)
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: state.location!.toLatLng(),
-                      width: 30,
-                      height: 30,
-                      child: const Icon(Icons.location_pin,
-                          color: Colors.red, size: 30),
-                    ),
-                  ],
-                ),
             ],
           ),
-        ),
       ],
     );
   }

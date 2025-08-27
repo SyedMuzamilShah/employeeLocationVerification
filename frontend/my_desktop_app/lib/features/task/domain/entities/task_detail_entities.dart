@@ -21,6 +21,8 @@ class TaskAssignmentEntity {
   final TaskAssignmentStatus status;
   final bool submittedLate;
   final DateTime? deadline;
+  final DateTime? checkIn;
+  final DateTime? checkOut;
   final bool faceVerification;
   final bool allowPicture;
   final double? confidence;
@@ -42,6 +44,8 @@ class TaskAssignmentEntity {
     required this.allowPicture,
     required this.employee,
     required this.taskLocation,
+    this.checkIn,
+    this.checkOut,
     this.taskLocationRadius,
     this.confidence,
     this.threshold,

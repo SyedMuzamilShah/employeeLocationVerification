@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_desktop_app/core/constants/app_colors.dart';
 import 'package:my_desktop_app/core/widgets/loading_widget.dart';
 import 'package:my_desktop_app/core/widgets/my_button.dart';
 import 'package:my_desktop_app/core/widgets/my_dialog_box.dart';
@@ -11,6 +12,7 @@ import 'package:my_desktop_app/features/task/presentation/provider/task_managmen
 import 'package:my_desktop_app/features/task/presentation/provider/tast_detail_load_provider.dart';
 import 'package:my_desktop_app/features/task/presentation/views/image_preview_widget.dart';
 import 'package:my_desktop_app/features/task/presentation/views/map_confirm_widget.dart';
+import 'package:my_desktop_app/features/task/presentation/widgets/Function/time_formate_func.dart';
 import 'package:my_desktop_app/features/task/presentation/widgets/manual_verification_buttons.dart';
 
 class TaskAssignmentDetailDialog extends ConsumerWidget {
@@ -45,26 +47,44 @@ class TaskAssignmentDetailDialog extends ConsumerWidget {
           _buildInfoRow('Status:',
               "${assignment.status.name} | ${assignment.validateMethod?.name}"),
           if (assignment.submittedAt != null) ...[
-            _buildInfoRow('Submitted At:', assignment.submittedAt.toString()),
-            _buildInfoRow(
-                'Submitted Late:', assignment.submittedLate.toString()),
+            _buildInfoRow('Submitted At:',
+                showTimeInFormattedFunction(assignment.submittedAt!)),
+            if (assignment.checkIn != null)
+            _buildInfoRow('Check In:',
+                showTimeInFormattedFunction(assignment.checkIn!)),
+
+            if (assignment.checkOut != null)
+            _buildInfoRow('Check Out:',
+                showTimeInFormattedFunction(assignment.checkOut!)),
+
+            if (assignment.checkIn != null && assignment.checkOut == null)
+            _buildInfoRow('Check Out:', 'Not check out yet'),
+
+            assignment.submittedLate
+                ? _buildInfoRow(
+                    'Submitted Late:', assignment.submittedLate.toString(), color: Theme.of(context).colorScheme.error)
+                : _buildInfoRow(
+                    'Submitted Late:', assignment.submittedLate.toString(), color: AppColors.success),
             if (assignment.confidence != null)
-              _buildInfoRow('Confidence:', '${assignment.confidence}%'),
+              _buildInfoRow(
+                  'Confidence:', '${assignment.confidence?.toInt()}%'),
           ],
+         
           if (assignment.allowPicture == true && assignment.image != null) ...[
-            const SizedBox(height: 10),
-            Row(
-              // spacing: 10,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Submitted Image:',
-                  style: TextStyle(fontWeight: FontWeight.w600),
-                ),
-                ImagePreviewWidget(image: assignment.image!),
-              ],
-            ),
-            const SizedBox(height: 10),
+            // const SizedBox(height: 10),
+            if (assignment.status.name != TaskAssignmentStatus.verified.name)
+              Row(
+                // spacing: 10,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    'Submitted Image:',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                  ImagePreviewWidget(image: assignment.image!),
+                ],
+              ),
+            // const SizedBox(height: 10),
             if (assignment.status != TaskAssignmentStatus.verified)
               Builder(builder: (_) {
                 if (assignment.status != TaskAssignmentStatus.verified) {
@@ -73,7 +93,7 @@ class TaskAssignmentDetailDialog extends ConsumerWidget {
                 return SizedBox.shrink();
               }),
           ],
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           MyCustomButton(
             btnText: 'View Map',
             onClick: () {
@@ -103,7 +123,7 @@ class TaskAssignmentDetailDialog extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoRow(String title, String value) {
+  Widget _buildInfoRow(String title, String value, {Color? color}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -112,8 +132,10 @@ class TaskAssignmentDetailDialog extends ConsumerWidget {
           SizedBox(
               width: 120,
               child: Text(title,
-                  style: const TextStyle(fontWeight: FontWeight.w600))),
-          Expanded(child: Text(value)),
+                  style: TextStyle(fontWeight: FontWeight.w600),)),
+          color != null ?
+          Expanded(child: Text(value.toUpperCase(), style: TextStyle(color: color),))
+          : Expanded(child: Text(value, style: TextStyle(color: color),))
         ],
       ),
     );

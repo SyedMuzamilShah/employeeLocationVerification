@@ -1,48 +1,46 @@
-class OrganizationReadPrams{
+class OrganizationReadPrams {
   final String? id;
   final String? organizationId;
 
   OrganizationReadPrams({this.id, this.organizationId});
 
   Map<String, dynamic> toJson() {
-    return {
-      'id' : id,
-      'organizationId' : organizationId
-    };
+    return {'id': id, 'organizationId': organizationId};
   }
 
-  factory OrganizationReadPrams.fromJson(json){
+  factory OrganizationReadPrams.fromJson(json) {
     return OrganizationReadPrams(
-      id: json['id'],
-      organizationId: json['organizationId']
-    );
+        id: json['id'], organizationId: json['organizationId']);
   }
-
 }
 
 class OrganiztionCreatePrams {
   final String name;
   final String email;
   final String phoneNumber;
-  final String website;
+  final String? website;
   final String address;
 
   OrganiztionCreatePrams({
     required this.name,
     required this.email,
     required this.phoneNumber,
-    required this.website,
+    this.website,
     required this.address,
   });
-
   Map<String, dynamic> toJson() {
-    return {
+    final data = {
       'name': name,
       'email': email,
       'phoneNumber': phoneNumber,
-      'website': website,
       'address': address,
     };
+
+    if (website != null && website!.trim().isNotEmpty) {
+      data['website'] = website!;
+    }
+
+    return data;
   }
 }
 
@@ -65,7 +63,7 @@ class OrganizationUpdatePrams {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      'organizationId': id,
       'name': name,
       'email': email,
       'phoneNumber': phoneNumber,
@@ -79,15 +77,15 @@ class OrganizationDeletePrams {
   final String? id;
   final String? organizationId;
 
-  OrganizationDeletePrams({this.id, this.organizationId}){
+  OrganizationDeletePrams({this.id, this.organizationId}) {
     if (id == null && organizationId == null) {
       throw Exception("Either 'id' or 'organizationId' is required");
     }
   }
-  
+
   Map<String, dynamic> toJson() {
     return {
-      'organizationId' : organizationId,
+      'organizationId': organizationId,
       'id': id,
     };
   }

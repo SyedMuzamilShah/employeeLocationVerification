@@ -1,5 +1,5 @@
-// 8. Help Center Screen
 import 'package:flutter/material.dart';
+import 'package:my_desktop_app/core/constants/app_constants.dart';
 
 class HelpCenterScreen extends StatelessWidget {
   const HelpCenterScreen({super.key});
@@ -7,32 +7,70 @@ class HelpCenterScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Help & Support')),
+      appBar: AppBar(
+        title: const Text('Help & Support'),
+        centerTitle: true,
+        elevation: 2,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          const Text(
+            "General Support",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
           _buildHelpItem(
             icon: Icons.help_outline,
             title: 'FAQs',
+            color: Colors.blue,
             onTap: () => _showHelpContent(
-                context, 'FAQs', 'Frequently Asked Questions content...'),
+              context,
+              'FAQs',
+              'Frequently Asked Questions content will be added here.',
+            ),
           ),
           _buildHelpItem(
             icon: Icons.email,
             title: 'Contact Us',
-            onTap: () => _showHelpContent(context, 'Contact Us',
-                'Email: support@example.com\nPhone: +1 234 567 890'),
+            color: Colors.green,
+            onTap: () => _showHelpContent(
+              context,
+              'Contact Us',
+              'Email: techIbac@gmail.com\nPhone: +92 313 0183976',
+            ),
           ),
+          const SizedBox(height: 16),
+          const Text(
+            "Feedback & Issues",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
           _buildHelpItem(
             icon: Icons.bug_report,
             title: 'Report a Bug',
+            color: Colors.red,
             onTap: () => _showBugReportDialog(context),
           ),
           _buildHelpItem(
             icon: Icons.feedback,
             title: 'Send Feedback',
+            color: Colors.orange,
             onTap: () => _showFeedbackDialog(context),
           ),
+          const SizedBox(height: 24),
+          Divider(color: Colors.grey.shade300),
+          const SizedBox(height: 12),
+          Center(
+            child: Text(AppConstants.copyright,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -41,13 +79,21 @@ class HelpCenterScreen extends StatelessWidget {
   Widget _buildHelpItem({
     required IconData icon,
     required String title,
+    required Color color,
     required VoidCallback onTap,
   }) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(vertical: 6),
       child: ListTile(
-        leading: Icon(icon),
-        title: Text(title),
+        leading: CircleAvatar(
+          backgroundColor: color.withOpacity(0.1),
+          child: Icon(icon, color: color),
+        ),
+        title: Text(title, style: const TextStyle(fontSize: 16)),
         trailing: const Icon(Icons.chevron_right),
         onTap: onTap,
       ),
@@ -58,6 +104,7 @@ class HelpCenterScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(title),
         content: Text(content),
         actions: [
@@ -71,34 +118,24 @@ class HelpCenterScreen extends StatelessWidget {
   }
 
   void _showBugReportDialog(BuildContext context) {
-    final _bugController = TextEditingController();
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text('Report a Bug'),
-        content: TextField(
-          controller: _bugController,
-          decoration: const InputDecoration(
-            hintText: 'Describe the bug you encountered...',
+        content: const SizedBox(
+          height: 150,
+          child: Center(
+            child: Text(
+              "This feature will be added soon.",
+              style: TextStyle(fontSize: 15),
+            ),
           ),
-          maxLines: 5,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Implement bug report submission
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('Bug report submitted. Thank you!')),
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('Submit'),
+            child: const Text('Close'),
           ),
         ],
       ),
@@ -106,33 +143,24 @@ class HelpCenterScreen extends StatelessWidget {
   }
 
   void _showFeedbackDialog(BuildContext context) {
-    final _feedbackController = TextEditingController();
-
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text('Send Feedback'),
-        content: TextField(
-          controller: _feedbackController,
-          decoration: const InputDecoration(
-            hintText: 'Share your feedback with us...',
+        content: const SizedBox(
+          height: 150,
+          child: Center(
+            child: Text(
+              "This feature will be added soon.",
+              style: TextStyle(fontSize: 15),
+            ),
           ),
-          maxLines: 5,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              // Implement feedback submission
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Thank you for your feedback!')),
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('Send'),
+            child: const Text('Close'),
           ),
         ],
       ),

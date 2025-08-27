@@ -81,30 +81,30 @@ class _MyDashBoradState extends ConsumerState<MyDashBorad> {
   void updateMainContent() {
     // if (!mounted) return;
 
-    final breadcrumbNotifier = ref.read(routeDisplayProvider.notifier);
+    final routeDisplayNotifier = ref.read(routeDisplayProvider.notifier);
     switch (sideBarController.selectedIndex) {
       case 0:
         mainContentWidget.value = MyDashBoradView();
         break;
       case 1:
-        breadcrumbNotifier.state =
+        routeDisplayNotifier.state =
             RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Employee'));
         mainContentWidget.value = MyEmployeeView();
         break;
       // case 2:
-      //   breadcrumbNotifier.state =
+      //   routeDisplayNotifier.state =
       //       RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Attendance'));
       //   mainContentWidget.value = MyAttendenceView();
 
       //   break;
       case 2:
-        breadcrumbNotifier.state =
+        routeDisplayNotifier.state =
             RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Tasks'));
         mainContentWidget.value = MyTaskView();
 
         break;
       case 3:
-        breadcrumbNotifier.state =
+        routeDisplayNotifier.state =
             RouteDisplayItem(route: RouteDisplayWidget(routeText: 'Settings'));
         mainContentWidget.value = MySettingView();
         break;
@@ -126,6 +126,7 @@ class _MyDashBoradState extends ConsumerState<MyDashBorad> {
     bool isMobile = MediaQuery.of(context).size.width <= 800;
 
     return Scaffold(
+      // backgroundColor: Theme.of(context).colorScheme.secondary,
       appBar: isMobile ? AppBar() : null,
       drawer: ExampleSidebarX(controller: sideBarController),
       body: Row(
@@ -146,6 +147,7 @@ class _MyDashBoradState extends ConsumerState<MyDashBorad> {
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.surface,
+                          // color: Theme.of(context).colorScheme.onSurface,
                           borderRadius: BorderRadius.vertical(
                             top: Radius.circular(state.borderRadius),
                           ),

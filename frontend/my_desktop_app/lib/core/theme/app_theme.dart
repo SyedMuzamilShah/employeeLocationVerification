@@ -3,6 +3,7 @@ import 'package:my_desktop_app/core/constants/app_colors.dart';
 
 class AppThemes {
   static final ThemeData lightTheme = ThemeData(
+    useMaterial3: true,
     brightness: Brightness.light,
     scaffoldBackgroundColor: AppColors.background,
     primaryColor: AppColors.primary,
@@ -42,12 +43,23 @@ class AppThemes {
       labelStyle: TextStyle(color: AppColors.darkGrey),
     ),
     textTheme: TextTheme(
-      bodyMedium: TextStyle(color: AppColors.onBackground),
+      headlineLarge: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: AppColors.onBackground),
+      headlineMedium: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: AppColors.onBackground),
       bodyLarge: TextStyle(fontSize: 16, color: AppColors.onBackground),
+      bodyMedium: TextStyle(fontSize: 14, color: AppColors.onBackground),
+      labelLarge: TextStyle(
+          fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.primary),
     ),
   );
 
   static final ThemeData darkTheme = ThemeData(
+    useMaterial3: true,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColors.darkBackground,
     primaryColor: AppColors.primaryVariant,
@@ -87,8 +99,18 @@ class AppThemes {
       labelStyle: TextStyle(color: AppColors.grey),
     ),
     textTheme: TextTheme(
-      bodyMedium: TextStyle(color: AppColors.white),
+      headlineLarge: TextStyle(
+          fontSize: 28,
+          fontWeight: FontWeight.bold,
+          color: AppColors.white),
+      headlineMedium: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          color: AppColors.white),
       bodyLarge: TextStyle(fontSize: 16, color: AppColors.white),
+      bodyMedium: TextStyle(fontSize: 14, color: AppColors.white),
+      labelLarge: TextStyle(
+          fontSize: 14, fontWeight: FontWeight.w500, color: AppColors.primary),
     ),
   );
 }

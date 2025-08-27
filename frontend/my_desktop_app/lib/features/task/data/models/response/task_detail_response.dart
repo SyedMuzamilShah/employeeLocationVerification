@@ -13,6 +13,8 @@ class TaskAssignmentModel extends TaskAssignmentEntity {
     super.employeeLocation,
     super.taskLocationRadius,
     super.confidence,
+    super.checkIn,
+    super.checkOut,
     super.threshold,
     super.validateMethod,
     super.submittedAt,
@@ -40,6 +42,12 @@ class TaskAssignmentModel extends TaskAssignmentEntity {
       validateMethod: _mapValidateMethod(json['validateMethod']),
       submittedAt: json['submittedAt'] != null
           ? DateTime.parse(json['submittedAt'])
+          : null,
+      checkIn: json['checkIn'] != null
+          ? DateTime.parse(json['checkIn'])
+          : null,
+      checkOut: json['checkOut'] != null
+          ? DateTime.parse(json['checkOut'])
           : null,
       image: json['employeeImage'],
       employee: EmployeeModel.fromJson(json['employee'] ?? {}),

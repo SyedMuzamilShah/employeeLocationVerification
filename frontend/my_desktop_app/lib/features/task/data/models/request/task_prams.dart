@@ -17,7 +17,7 @@ class TaskCreateParams extends Equatable {
       required this.description,
       required this.dueDate,
       this.location,
-      this.radius
+      this.radius = 1000
       });
 
   toJson() {

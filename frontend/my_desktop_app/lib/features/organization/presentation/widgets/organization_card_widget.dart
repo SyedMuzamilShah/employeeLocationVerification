@@ -29,7 +29,7 @@ class OrganizationCardWidget extends ConsumerWidget {
     if (context.mounted && response) {
       mainContentWidget.value = OverView();
       ref.read(routeDisplayProvider.notifier).state = RouteDisplayItem(
-        route: OrganizationRoute(name: ref.read(organizationProvider).selectedOrganization!.name,)
+        route: OrganizationRoute(name: ref.read(organizationProvider).selectedOrganization!.organizationId,)
       );
     }
   }

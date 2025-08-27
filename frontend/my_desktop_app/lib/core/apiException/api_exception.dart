@@ -5,7 +5,7 @@ class ApiException implements Exception {
   ApiException(this.message);
 
   factory ApiException.fromDioError(DioException error) {
-    print("Type : ${error.type} \t StatusCode : ${error.response?.statusCode}");
+    print("Type : ${error.type} \t StatusCode : ${error.response?.statusCode}, FileName:core/apiException/");
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
@@ -21,7 +21,7 @@ class ApiException implements Exception {
       case DioExceptionType.badResponse:
         return _handleBadResponse(error);
       default:
-        return ApiException(error.error.toString() ?? "Something went wrong.");
+        return ApiException(error.error.toString());
     }
   }
 
@@ -51,6 +51,7 @@ class NetworkException implements Exception {
 }
 
 ApiException _handleBadResponse(DioException error) {
+  print(error.response?.data);
   final statusCode = error.response?.statusCode;
   final responseData = error.response?.data;
   // print("Bad Request statusCode : $statusCode");

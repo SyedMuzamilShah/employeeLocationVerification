@@ -136,7 +136,7 @@ class _MyEmployeeViewState extends ConsumerState<MyEmployeeView> {
                               ref.read(routeDisplayProvider.notifier).state =
                                   RouteDisplayItem(
                                       route: EmployeeRoute(
-                                name: data[index].name,
+                                name: data[index].employeeId,
                               ));
 
                               // change the main content

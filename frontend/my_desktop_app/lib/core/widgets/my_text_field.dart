@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class MyCustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
   final String? errorText;
   final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
   final TextInputAction? textInputAction;
   final FocusNode? focusNode;
   final bool? enabled;
@@ -20,6 +22,7 @@ class MyCustomTextField extends StatelessWidget {
     required this.controller,
     required this.hintText,
     this.errorText,
+    this.inputFormatters,
     this.maxLines = 1,
     this.obscureText = false,
     this.validatorFuncation,
@@ -35,7 +38,10 @@ class MyCustomTextField extends StatelessWidget {
         enabled: enabled,
         focusNode: focusNode,
         textInputAction: textInputAction,
+
+
         keyboardType: keyboardType,
+        inputFormatters: inputFormatters,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         controller: controller,
         obscureText: obscureText,
@@ -45,8 +51,8 @@ class MyCustomTextField extends StatelessWidget {
         validator: (value) =>
             validatorFuncation != null ? validatorFuncation!(value) : null,
         decoration: InputDecoration(
-          errorText: hasError ? '' : null, // 👈 This hides the default error message
-          errorStyle: const TextStyle(height: 0), // 👈 Prevents spacing
+          errorText: hasError ? '' : null,
+          errorStyle: const TextStyle(height: 0),
           label: labelText != null
               ? Text(labelText!)
               : null,

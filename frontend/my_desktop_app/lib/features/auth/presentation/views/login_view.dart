@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_desktop_app/core/routes/routes.dart';
 import 'package:my_desktop_app/core/widgets/loading_widget.dart';
+import 'package:my_desktop_app/core/widgets/logo_widget.dart';
 import 'package:my_desktop_app/core/widgets/my_button.dart';
 import 'package:my_desktop_app/core/widgets/my_text_field.dart';
 import 'package:my_desktop_app/features/auth/data/models/request/login_params.dart';
@@ -12,177 +13,163 @@ class LoginView extends ConsumerStatefulWidget {
   const LoginView({super.key});
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _LoginViewState();
+  ConsumerState<LoginView> createState() => _LoginViewState();
 }
 
 class _LoginViewState extends ConsumerState<LoginView> {
   late TextEditingController emailController;
   late TextEditingController passwordController;
+  final _formKey = GlobalKey<FormState>();
+
+  Map<String, String> fieldErrors = {};
 
   @override
   void initState() {
+    super.initState();
     emailController = TextEditingController();
     passwordController = TextEditingController();
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    Map<String, String> fieldErrors = {};
-    final bool isMobile = MediaQuery.of(context).size.width < 600;
-    final login = ref.watch(basicAuthProvider.notifier);
-    final state = ref.watch(basicAuthProvider);
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    final authNotifier = ref.watch(basicAuthProvider.notifier);
+    final authState = ref.watch(basicAuthProvider);
 
-    login.addListener((state) {
-      if (state.errorList != null) {
-        fieldErrors = {for (var e in state.errorList!) e['path']: e['msg']};
-      }
-    });
-    final _formKey = GlobalKey<FormState>();
+    if (authState.errorList != null) {
+      fieldErrors = {
+        for (var error in authState.errorList!) error['path']: error['msg']
+      };
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Center(child: Text("Login")),
+        title: const Text("Login As Admin"),
         centerTitle: true,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: Theme.of(context).primaryColor,
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Center(
-          child: Container(
-            width: isMobile ? double.infinity : 600, // Responsive width
-            padding: EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // if (!isMobile)
-                // Expanded(
-                //   flex: 1,
-                //   child: Center(child: Text("Image"),)),
-
-                Expanded(
-                  flex: 2,
-                  child: Card(
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Builder(builder: (context) {
-                        return SingleChildScrollView(
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Text(
-                                //   'Login an Account',
-                                //   style: Theme.of(context)
-                                //       .textTheme
-                                //       .titleLarge
-                                //       ?.copyWith(fontSize: isMobile ? 18 : 24),
-                                // ),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(50),
-                                  child: SizedBox(
-                                    height: 80,
-                                    child: Image.asset(
-                                      'assets/app_icon.png',
-                                      errorBuilder:
-                                          (context, error, stackTrace) {
-                                        return CircleAvatar(
-                                          child: Icon(Icons.person),
-                                        );
-                                      },
-                                      fit: BoxFit.fill,
-                                    ),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Stack(
+            children: [
+              Container(
+                width: isMobile ? double.infinity : 500,
+                margin: const EdgeInsets.only(top: 40),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black45,
+                      blurStyle: BlurStyle.outer,
+                      blurRadius: 8,
+                      offset: Offset(0, 4),
+                    )
+                  ],
+                ),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(
+                        height: 80,
+                        child: ListView(
+                          children: [
+                            SizedBox(height: 30,),
+                            if (authState.isLoading) const MyLoadingWidget(),
+                            if (authState.errorMessage != null)
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(10),
+                                margin: const EdgeInsets.only(bottom: 10),
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.error.withValues(alpha: 0.7),
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Text(
+                                  authState.errorMessage!,
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.onError,
+                                    fontSize: 14,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                if (state.isLoading) const MyLoadingWidget(),
-                                if (state.errorMessage != null)
-                                  Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.all(10),
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    decoration: BoxDecoration(
-                                      color:
-                                          Theme.of(context).colorScheme.error,
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        state.errorMessage!,
-                                        style: TextStyle(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .onError,
-                                            fontSize: 14),
-                                      ),
-                                    ),
-                                  ),
-                                MyCustomTextField(
-                                  controller: emailController,
-                                  hintText: "Email",
-                                  errorText: fieldErrors['email'],
-                                ),
-                                MyCustomTextField(
-                                  controller: passwordController,
-                                  hintText: "Password",
-                                  obscureText: true,
-                                  errorText: fieldErrors['password'],
-                                ),
-                                SizedBox(height: 20),
-                                MyCustomButton(
-                                  btnText: 'Login',
-                                  onClick: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      final pramas = LoginParams(
-                                        email: emailController.text.trim(),
-                                        password:
-                                            passwordController.text.trim(),
-                                      );
-
-                                      bool isLogin = await login.login(pramas);
-
-                                      if (isLogin && context.mounted) {
-                                        Navigator.popAndPushNamed(
-                                            context, AppRoutes.dashborad);
-                                      }
-                                    }
-                                  },
-                                ),
-                                SizedBox(height: 16),
-                                const SizedBox(height: 20),
-                                Text.rich(
-                                  TextSpan(
-                                    text: "Don't have an account? ",
-                                    children: [
-                                      TextSpan(
-                                        text: 'Register',
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                        recognizer: TapGestureRecognizer()
-                                          ..onTap = () {
-                                            login.clearState();
-                                            Navigator.pushNamed(
-                                                context, AppRoutes.register);
-                                          },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                              ),
+                          ],
+                        ),
+                      ),
+                      
+                      MyCustomTextField(
+                        controller: emailController,
+                        hintText: "Email",
+                        errorText: fieldErrors['email'],
+                        validatorFuncation: (value){
+                          print(value == null);
+                          print("Tesing the object $value");
+                          if (value != null){
+                            if (value.isNotEmpty){
+                              return null;
+                            }
+                          }
+                          return 'Please fill email box';
+                        },
+                      ),
+                      MyCustomTextField(
+                        controller: passwordController,
+                        hintText: "Password",
+                        obscureText: true,
+                        errorText: fieldErrors['password'],
+                      ),
+                      const SizedBox(height: 20),
+                      MyCustomButton(
+                        btnText: 'Login',
+                        onClick: () async {
+                          if (_formKey.currentState!.validate()) {
+                            final params = LoginParams(
+                              email: emailController.text.trim(),
+                              password: passwordController.text.trim(),
+                            );
+                            final success = await authNotifier.login(params);
+                            if (success && context.mounted) {
+                              Navigator.popAndPushNamed(
+                                  context, AppRoutes.dashborad);
+                            }
+                          }
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      Text.rich(
+                        TextSpan(
+                          text: "Don't have an account? ",
+                          style: const TextStyle(fontSize: 14),
+                          children: [
+                            TextSpan(
+                              text: 'Register',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  authNotifier.clearState();
+                                  Navigator.popAndPushNamed(
+                                      context, AppRoutes.register);
+                                },
                             ),
-                          ),
-                        );
-                      }),
-                    ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              Positioned(top: 0, left: 0, right: 0, child: AppLogoWidget()),
+            ],
           ),
         ),
       ),

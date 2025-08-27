@@ -11,17 +11,19 @@ class LineChartWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(loadTaskStatisticsProvider(null));
-
+    final provider = ref.watch(loadTaskStatisticsProvider);
+    
     return provider.when(
         error: (error, _) => ErrorWidget(error),
         loading: () => MyLoadingWidget(),
         data: (data) {
-          final chartData = data.map((d) => SalesData(d.month, d.taskNo.toDouble())).toList();
+          final chartData = data.map((d) {
+            return YearRecord(d.month, d.taskNo.toDouble());
+          }).toList();
           
           return SfCartesianChart(
             title: ChartTitle(
-              text: 'Organization Task'
+              text: 'Organization Task 2025'
             ),
             primaryXAxis: CategoryAxis(
               labelStyle: const TextStyle(fontSize: 12),
@@ -29,11 +31,11 @@ class LineChartWidget extends ConsumerWidget {
             primaryYAxis: NumericAxis(
               labelStyle: const TextStyle(fontSize: 12),
             ),
-            series: <LineSeries<SalesData, String>>[
-              LineSeries<SalesData, String>(
+            series: <LineSeries<YearRecord, String>>[
+              LineSeries<YearRecord, String>(
                 dataSource: chartData,
-                xValueMapper: (SalesData sales, _) => sales.year,
-                yValueMapper: (SalesData sales, _) => sales.sales,
+                xValueMapper: (YearRecord sales, _) => sales.month,
+                yValueMapper: (YearRecord sales, _) => sales.taskNumber,
                 color: primaryColor,
                 width: 3,
                 markerSettings: const MarkerSettings(
@@ -48,11 +50,11 @@ class LineChartWidget extends ConsumerWidget {
   }
 }
 
-class SalesData {
-  final String year;
-  final double sales;
+class YearRecord {
+  final String month;
+  final double taskNumber;
 
-  SalesData(this.year, this.sales);
+  YearRecord(this.month, this.taskNumber);
 }
 
 class ChartData {

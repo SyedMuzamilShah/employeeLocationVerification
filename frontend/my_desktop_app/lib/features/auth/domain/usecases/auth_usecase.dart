@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:my_desktop_app/core/failure/failure.dart';
+import 'package:my_desktop_app/features/auth/data/models/request/change_password_params.dart';
 import 'package:my_desktop_app/features/auth/data/models/request/login_params.dart';
 import 'package:my_desktop_app/features/auth/data/repositories/basic_auth_impl.dart';
 import 'package:my_desktop_app/features/auth/domain/entities/user_entities.dart';
@@ -9,6 +10,7 @@ import 'package:my_desktop_app/features/auth/data/models/request/register_params
 abstract class AuthUsecase {
   Future<Either<Failure, UserEntities>> register(RegisterParams params);
   Future<Either<Failure, UserEntities>> login(LoginParams params);
+  Future<Either<Failure, String>> changePassword(ChangePasswordParams params);
   Future<Either<Failure, bool>> isLogin();
   Future<Either<Failure, String>> logout();
   Future<Either<Failure, UserEntities>> getUser();
@@ -48,5 +50,10 @@ class AuthUsecaseImpl extends AuthUsecase {
   @override
   Future<Either<Failure, bool>> isLogin() async {
     return await _authRepo.isLogin();
+  }
+  
+  @override
+  Future<Either<Failure, String>> changePassword(ChangePasswordParams params) async {
+    return await _authRepo.changePassword(params);
   }
 }

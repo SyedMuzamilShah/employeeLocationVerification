@@ -6,6 +6,7 @@ import 'package:my_desktop_app/core/failure/failure.dart';
 import 'package:my_desktop_app/core/network/network_info.dart';
 import 'package:my_desktop_app/features/auth/data/datasources/auth_local_data_source.dart';
 import 'package:my_desktop_app/features/auth/data/datasources/auth_remote.dart';
+import 'package:my_desktop_app/features/auth/data/models/request/change_password_params.dart';
 import 'package:my_desktop_app/features/auth/data/models/request/login_params.dart';
 import 'package:my_desktop_app/features/auth/data/models/request/register_params.dart';
 import 'package:my_desktop_app/features/auth/data/models/response/token_response_model.dart';
@@ -18,7 +19,8 @@ class AuthRepoImpl
         RegisterRepository,
         LoginRepository,
         LogoutRepository,
-        UserRepository {
+        UserRepository,
+        ChangePasswordRepository {
   final AuthLocalDataSource _localDataSource;
   final AuthRemoteDataSources _remoteDataSource;
   final NetworkInfo _networkInfo;
@@ -62,8 +64,7 @@ class AuthRepoImpl
 
   /// **Register New User**
   @override
-  Future<Either<Failure, UserEntities>> register(
-      RegisterParams params) async {
+  Future<Either<Failure, UserEntities>> register(RegisterParams params) async {
     return _handleAuthResponse(
         () => _remoteDataSource.register(params.toJson()));
   }
@@ -163,10 +164,31 @@ class AuthRepoImpl
         (succ) async {
       final tk = succ['data']['tokens'];
 
-      // only Cache the token 
+      // only Cache the token
       // user data is already Cached
       await _localDataSource.cacheToken(tk);
       return Right(true);
     });
+  }
+
+  @override
+  Future<Either<Failure, String>> changePassword(
+      ChangePasswordParams params) async {
+    if (!await _networkInfo.isConnected) {
+      return Left(NetworkFailure(message: 'No internet connection'));
+    }
+
+    try {
+      final response = await _remoteDataSource.changePassword(params.toJson());
+
+      return response.fold((err) {
+        return Left(err);
+      }, (data) async {
+        print("FROM here Every thing is fine");
+        return Right("Password change successfully");
+      });
+    } catch (e) {
+      return Left(Failure(message: 'failed to change: ${e.toString()}'));
+    }
   }
 }

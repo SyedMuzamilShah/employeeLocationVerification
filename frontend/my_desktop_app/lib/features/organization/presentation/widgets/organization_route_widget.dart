@@ -15,11 +15,15 @@ class OrganizationRoute extends ConsumerWidget {
     return RouteDisplayWidget(
       routeText: 'Organization',
       routeTextClick: () async {
+        await ref.read(organizationProvider.notifier).clearOrganizationSaved();
+
         ref.read(routeDisplayProvider.notifier).state = RouteDisplayItem(
             route: RouteDisplayWidget(routeText: 'Organization'));
-        mainContentWidget.value = OrganizationView();
 
-        await ref.read(organizationProvider.notifier).clearOrganizationSaved();
+          Future.microtask(() {
+    mainContentWidget.value = const OrganizationView();
+  });
+        // mainContentWidget.value = OrganizationView();
         return;
       },
       subRouteText: name,

@@ -47,6 +47,7 @@ void showEditOrganizationDialog(BuildContext context,
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            spacing: 20,
             children: [
               TextField(
                 controller: nameController,
@@ -129,7 +130,7 @@ void showDeleteConfirmationDialog(
             onPressed: () async {
               Navigator.pop(context); // Close the dialog first
               try {
-                final model = OrganizationDeletePrams(id: orgId);
+                final model = OrganizationDeletePrams(organizationId: orgId);
                 await notifier.delete(model);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(

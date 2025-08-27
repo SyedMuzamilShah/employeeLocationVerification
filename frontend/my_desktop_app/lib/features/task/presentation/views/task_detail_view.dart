@@ -11,6 +11,8 @@ import 'package:my_desktop_app/features/task/presentation/views/task_assignment_
 import 'package:my_desktop_app/features/task/presentation/widgets/Function/confirm_delete_task.dart';
 import 'package:my_desktop_app/features/task/presentation/widgets/task_route.dart';
 import 'package:my_desktop_app/features/task/presentation/widgets/task_update_dialog.dart';
+import 'package:my_desktop_app/features/task/presentation/widgets/Function/time_formate_func.dart';
+import 'package:readmore/readmore.dart';
 
 class TaskDetailView extends ConsumerStatefulWidget {
   final TaskEntities task;
@@ -47,23 +49,30 @@ class _TaskDetailViewState extends ConsumerState<TaskDetailView> {
                   _headerSection(theme),
                   const SizedBox(height: 20),
                   _infoTile("Description", widget.task.description),
+
                   _infoTile(
-                      "Due Date", widget.task.dueDate.toLocal().toString()),
+                      "Due Date", showTimeInFormattedFunction(widget.task.dueDate)),
+
                   _infoTile("Address", widget.task.location?.address ?? 'N/A'),
-                  const SizedBox(height: 12),
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.map),
-                    title: Text(
-                      "Coordinates",
-                      style: theme.textTheme.titleMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(
-                      "${widget.task.location?.longitude.toStringAsFixed(4) ?? 'N/A'} | ${widget.task.location?.latitude.toStringAsFixed(4) ?? 'N/A'}\nRadius : ~${widget.task.aroundDistanceMeter}",
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ),
+                  // const SizedBox(height: 12),
+                  _infoTile('Coordinates', "${widget.task.location?.longitude.toStringAsFixed(4) ?? 'N/A'} | ${widget.task.location?.latitude.toStringAsFixed(4) ?? 'N/A'} Radius : ~${widget.task.aroundDistanceMeter} meter"),
+                  SizedBox(height: 150,)
+                  // ListTile(
+                  //   contentPadding: EdgeInsets.zero,
+                  //   leading: const Icon(Icons.map),
+                  //   title: Text(
+                  //     "Coordinates",
+                  //     style: theme.textTheme.titleMedium
+                  //         ?.copyWith(fontWeight: FontWeight.bold),
+                  //   ),
+                  //   subtitle: Text(
+                  //     "${widget.task.location?.longitude.toStringAsFixed(4) ?? 'N/A'} | ${widget.task.location?.latitude.toStringAsFixed(4) ?? 'N/A'}\nRadius : ~${widget.task.aroundDistanceMeter}",
+                  //     style: theme.textTheme.bodyMedium,
+                  //   ),
+                  // ),
+                  // ListTile(
+                  //   leading: _infoTile('Coordinates', "${widget.task.location?.longitude.toStringAsFixed(4) ?? 'N/A'} | ${widget.task.location?.latitude.toStringAsFixed(4) ?? 'N/A'} Radius : ~${widget.task.aroundDistanceMeter}"),
+                  // )
                 ],
               ),
             ),
@@ -159,20 +168,34 @@ class _TaskDetailViewState extends ConsumerState<TaskDetailView> {
   }
 
   Widget _infoTile(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0),
-      child: Row(
-        children: [
-          Text("$label: ",
-              style:
-                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 16)),
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6.0),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 120, // You can adjust this value based on your layout
+          child: Text(
+            "$label :",
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+        Expanded(
+          // child: Text(
+          //   value,
+          //   style: const TextStyle(fontSize: 16),
+          // ),
+          child: ReadMoreText(
+            value,
+            trimLines: 2,
+            style: const TextStyle(fontSize: 16),
+            ),
+        ),
+      ],
+    ),
+  );
+}
+
 
   Widget _statusBadge(String status) {
     Color color;

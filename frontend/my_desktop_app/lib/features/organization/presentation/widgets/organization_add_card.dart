@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_desktop_app/core/widgets/loading_widget.dart';
 import 'package:my_desktop_app/core/widgets/my_text_field.dart';
@@ -14,8 +15,8 @@ class OrganizationAddWidget extends StatefulWidget {
 
 class OrganizationAddWidgetState extends State<OrganizationAddWidget> {
   final _formKey = GlobalKey<FormState>();
-  String? _selectedCountryCode = '+1';
-  final List<String> _countryCodes = ['+1', '+44', '+91', '+86', '+33'];
+  String? _selectedCountryCode = '+92';
+  final List<String> _countryCodes = ["+92"];
 
   late TextEditingController nameController;
   late TextEditingController emailController;
@@ -131,6 +132,10 @@ class OrganizationAddWidgetState extends State<OrganizationAddWidget> {
                           controller: phoneController,
                           hintText: 'Phone Number',
                           errorText: fieldErrors['phoneNumber'],
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                          ],
                         ),
                       ),
                     ],

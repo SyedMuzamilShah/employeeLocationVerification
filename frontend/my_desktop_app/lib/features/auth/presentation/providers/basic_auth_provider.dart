@@ -1,43 +1,30 @@
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:my_desktop_app/core/failure/failure.dart';
-import 'package:my_desktop_app/core/network/network_info.dart';
-import 'package:my_desktop_app/core/services/api_services.dart';
-import 'package:my_desktop_app/core/services/local_database_service.dart';
-import 'package:my_desktop_app/core/services/token_service.dart';
-import 'package:my_desktop_app/features/auth/data/datasources/auth_local_data_source.dart';
-import 'package:my_desktop_app/features/auth/data/datasources/auth_remote_impl.dart';
 import 'package:my_desktop_app/features/auth/data/models/request/login_params.dart';
 import 'package:my_desktop_app/features/auth/data/models/request/register_params.dart';
-import 'package:my_desktop_app/features/auth/data/repositories/basic_auth_impl.dart';
 import 'package:my_desktop_app/features/auth/domain/entities/user_entities.dart';
 import 'package:my_desktop_app/features/auth/domain/usecases/auth_usecase.dart';
+import 'package:my_desktop_app/features/auth/presentation/providers/auth_provider_register.dart';
 
 /// **StateNotifierProvider for Authentication**
 final basicAuthProvider =
     StateNotifierProvider<BasicAuthProviderNotifier, BasicAuthProviderState>(
-  (ref) => BasicAuthProviderNotifier(),
+  (ref) => BasicAuthProviderNotifier(ref),
 );
 
 /// **Notifier for Authentication State Management**
 class BasicAuthProviderNotifier extends StateNotifier<BasicAuthProviderState> {
-  BasicAuthProviderNotifier() : super(BasicAuthProviderState());
+  final Ref _ref;
+  late final AuthUsecase _authUsecase;
 
-  final AuthUsecase _authUsecase = AuthUsecaseImpl(
-      authRepo: AuthRepoImpl(
-    remoteDataSource: AuthRemoteDataSourcesImpl(api: ApiServices()),
-    localDataSource: AuthLocalDataSourceImpl(
-      tokenService: TokenService(),
-      localDb: LocalDatabaseService(),
-    ),
-    networkInfo: NetworkInfoImpl(Connectivity()),
-  ));
+  BasicAuthProviderNotifier(this._ref) : super(BasicAuthProviderState()) {
+    _authUsecase = _ref.read(authUsecaseProvider);
+  }
 
   /// **Logout User**
   Future<bool> logout() async {
-
     _setLoadingState();
     final response = await _authUsecase.logout();
 
@@ -126,9 +113,9 @@ class BasicAuthProviderNotifier extends StateNotifier<BasicAuthProviderState> {
         errorMessage: message, errorList: errors, isLoading: false);
   }
 
-  void _clearLoadingState() {
-    state = state.copyWith(isLoading: false);
-  }
+  // void _clearLoadingState() {
+  //   state = state.copyWith(isLoading: false);
+  // }
 
   Future<Either<Failure, UserEntities>> getUser() async {
     debugPrint("Get User Function Called With In [Basic Auth Provider]");
@@ -173,6 +160,6 @@ class BasicAuthProviderState {
   }
 
   BasicAuthProviderState clear() => BasicAuthProviderState().copyWith(
-    errorList: [],
-  );
+        errorList: [],
+      );
 }

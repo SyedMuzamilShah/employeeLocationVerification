@@ -2,7 +2,7 @@ import 'package:my_desktop_app/core/services/token_service.dart';
 import 'package:my_desktop_app/core/errors/exceptions.dart';
 
 abstract class OrganizationLocalSources {
-  Future<void> clearOrganization();
+  Future<void> clearLocalOrganization();
   Future<void> cacheOrganization(Map<String, dynamic> organization);
   Future<Map<String, dynamic>?> getOrganization();
 }
@@ -28,9 +28,7 @@ class OrganizationLocalSourcesImpl implements OrganizationLocalSources {
   }
   
   @override
-  Future<void> clearOrganization() async {
+  Future<void> clearLocalOrganization() async {
     await _tokenService.clearOrganization();
-    // TODO: implement clearOrganization
-    throw UnimplementedError();
   }
 }

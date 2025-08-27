@@ -1,12 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:my_desktop_app/core/constants/app_constants.dart';
 import 'package:my_desktop_app/core/provider/main_content_provider.dart';
 import 'package:my_desktop_app/core/provider/route_provider.dart';
 import 'package:my_desktop_app/core/provider/theme_provider.dart';
 import 'package:my_desktop_app/features/auth/presentation/views/change_password_view.dart';
 import 'package:my_desktop_app/features/auth/presentation/views/edit_profile_view.dart';
 import 'package:my_desktop_app/features/dashboard/presentation/providers/user_profile_provider.dart';
+import 'package:my_desktop_app/features/settings/presentation/views/help_center_view.dart';
+import 'package:my_desktop_app/features/settings/presentation/views/privacy_policy_view.dart';
 import 'package:my_desktop_app/features/settings/presentation/widgets/setting_route.dart';
 
 class MySettingView extends ConsumerWidget {
@@ -28,7 +31,12 @@ class MySettingView extends ConsumerWidget {
                 route: SettingRoute(
               name: 'Edit Profile',
             ));
+
+            // Read Saved used
             var userData = await ref.read(userDataProvider.future);
+
+
+            // Display Widget
             mainContentWidget.value = EditProfileView(userProfile: userData);
           },
         ),
@@ -52,12 +60,14 @@ class MySettingView extends ConsumerWidget {
         //   title: Text('Notification Settings'),
         //   onTap: () {
         //     // Navigate to Notification Settings screen
+        //     Navigator.push(context, MaterialPageRoute(builder: (_)=> HelpCenterScreen()));
         //   },
         // ),
         // ListTile(
         //   leading: Icon(Icons.language),
         //   title: Text('Language and Region'),
         //   onTap: () {
+        //     Navigator.push(context, MaterialPageRoute(builder: (_)=> LanguageSettingsScreen(currentLanguage: 'eng',)));
         //     // Navigate to Language Settings screen
         //   },
         // ),
@@ -81,23 +91,36 @@ class MySettingView extends ConsumerWidget {
         ),
         // Divider(),
 
-        //     // Privacy & Support
-        //     _buildSectionTitle('Privacy & Support'),
-        //     ListTile(
-        //       leading: Icon(Icons.privacy_tip),
-        //       title: Text('Privacy and Security'),
-        //       onTap: () {
-        //         // Navigate to Privacy Settings screen
-        //       },
-        //     ),
-        //     // Help and Support
-        //     ListTile(
-        //       leading: Icon(Icons.help),
-        //       title: Text('Help and Support'),
-        //       onTap: () {
-        //         // Navigate to Help Center
-        //       },
-        //     ),
+            // Privacy & Support
+            _buildSectionTitle('Privacy & Support'),
+            ListTile(
+              leading: Icon(Icons.privacy_tip),
+              title: Text('Privacy and Security'),
+              onTap: () {
+                // Navigate to Privacy Settings screen
+                Navigator.push(context, MaterialPageRoute(builder: (_)=> PrivacyPolicyScreen()));
+
+              },
+            ),
+            // Help and Support
+            ListTile(
+              leading: Icon(Icons.help),
+              title: Text('Help and Support'),
+              onTap: () {
+                // Navigate to Help Center
+                Navigator.push(context, MaterialPageRoute(builder: (_)=> HelpCenterScreen()));
+              },
+            ),
+            // Spacer(),
+            Center(
+            child: Text(AppConstants.copyright,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey,
+              ),
+            ),
+          ),
       ],
     );
   }

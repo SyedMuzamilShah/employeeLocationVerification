@@ -52,7 +52,7 @@ class MyTopBarWidget extends ConsumerWidget {
                 ?.copyWith(color: Colors.red),
           ),
         ),
-
+    
         // Right: Avatar with dropdown
         userProfile.when(
           data: (user) => Stack(

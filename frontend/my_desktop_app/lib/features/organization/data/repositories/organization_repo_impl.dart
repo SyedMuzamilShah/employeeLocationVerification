@@ -74,6 +74,6 @@ class OrganizationRepoImpl extends OrganizationRepo {
   
   @override
   Future<void> clearOrganization() async {
-    await _localSources.clearOrganization();
+    await _localSources.clearLocalOrganization();
   }
 }

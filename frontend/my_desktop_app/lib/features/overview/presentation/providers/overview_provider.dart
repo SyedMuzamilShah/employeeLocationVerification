@@ -7,9 +7,14 @@ import 'package:my_desktop_app/features/overview/data/models/request/task_statis
 import 'package:my_desktop_app/features/overview/data/repositories/statistics_repo_impl.dart';
 import 'package:my_desktop_app/features/overview/domain/usecases/overview_usecase.dart';
 
-final loadTaskStatisticsProvider = FutureProvider.family.autoDispose((ref, params) async {
+
+
+final loadTaskStatisticsProvider = FutureProvider.autoDispose((ref) async {
   final String? organizationId =
       ref.read(organizationProvider).selectedOrganization?.id;
+
+      print(organizationId);
+      print("testing of statistic");
 
   StatisticsUseCase useCase = StatisticsUseCase(StatisticsRepoImpl(
       StatisticsRemoteDataSourceImpl(apiServices: ApiServices())));
@@ -27,7 +32,7 @@ final loadTaskStatisticsProvider = FutureProvider.family.autoDispose((ref, param
 });
 
 final loadEmployeeRollStatisticsProvider =
-    FutureProvider.family.autoDispose((ref, params) async {
+    FutureProvider.autoDispose((ref) async {
   final String? organizationId =
       ref.read(organizationProvider).selectedOrganization?.id;
 

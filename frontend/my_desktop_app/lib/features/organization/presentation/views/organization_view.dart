@@ -57,7 +57,6 @@ class _OrganizationViewState extends ConsumerState<OrganizationView> {
   Widget _buildBody(OrganizationState state, BuildContext context,
       OrganizationNotifier notifier) {
     final loadOrganization = ref.watch(organizationsLoadProvider);
-    
     return loadOrganization.when(
         data: (data) { 
           if (data.isEmpty) {
@@ -83,9 +82,9 @@ class _OrganizationViewState extends ConsumerState<OrganizationView> {
             child: GridView.builder(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: _getGridColumns(context),
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 1.2, // Adjusts the aspect ratio of the cards
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 1.45, // Adjusts the aspect ratio of the cards
               ),
               itemCount: state.organizations.length,
               itemBuilder: (context, index) {

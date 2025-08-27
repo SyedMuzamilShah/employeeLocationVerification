@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:my_desktop_app/core/widgets/loading_widget.dart';
@@ -20,11 +21,19 @@ class TaskForm extends ConsumerStatefulWidget {
 
 class _TaskFormState extends ConsumerState<TaskForm> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController();
-  final _descriptionController = TextEditingController();
-  final _radiusController = TextEditingController();
+  late TextEditingController _titleController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _radiusController;
 
   final DateTime _dueDate = DateTime.now().add(const Duration(minutes: 30));
+
+  @override
+  void initState() {
+    _titleController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _radiusController  = TextEditingController(text: '1000');
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -90,6 +99,9 @@ class _TaskFormState extends ConsumerState<TaskForm> {
               hintText: "Enter task Radius",
               errorText: fieldErrors['radius'],
               prefixIcon: Icons.circle,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp("[0-9]"))
+              ],
               onChanged: (value) {
                 if (value.isEmpty) return;
 
@@ -114,7 +126,7 @@ class _TaskFormState extends ConsumerState<TaskForm> {
         'Add New Task',
         style: theme.textTheme.headlineSmall?.copyWith(
           fontWeight: FontWeight.bold,
-          color: colorScheme.onPrimary,
+          color: colorScheme.onSurface,
         ),
       ),
     );

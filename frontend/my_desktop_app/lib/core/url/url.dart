@@ -5,14 +5,14 @@
 class ServerUrl {
   static const String _ip = 'localhost';
   static const String baseUrl = 'http://$_ip:3000/api/v1';
-
+  // static const String baseUrl = 'https://b3c3-2402-ad80-8b-5e50-a84e-f3fe-21eb-741b.ngrok-free.app/api/v1';
   
   static const String userRegisterRoute = '$baseUrl/admin/auth/register';
   static const String userLoginRoute = '$baseUrl/admin/auth/login';
   static const String userLogoutRoute = '$baseUrl/admin/auth/logout';
   static const String userRefreshToken = '$baseUrl/admin/auth/token';
   static const String userForgotRoute = '';
-  static const String userChangePasswordRoute = '';
+  static const String userChangePasswordRoute = '$baseUrl/admin/auth/change-password';
   static const String userGetProfileRoute = '';
 
 
@@ -36,7 +36,7 @@ class ServerUrl {
 
   static const String userGetOrganization = '$baseUrl/admin/organization/get';
   static const String userCreateOrganization = '$baseUrl/admin/organization/register';
-  static const String userUpdateOrganization = '$baseUrl/admin/organization/get';
+  static const String userUpdateOrganization = '$baseUrl/admin/organization/edit';
   static const String userDeleteOrganization = '$baseUrl/admin/organization/delete';
 
   static const String taskRead = '$baseUrl/admin/task/get';

@@ -10,7 +10,7 @@ class PieChartWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final provider = ref.watch(loadEmployeeRollStatisticsProvider(null));
+    final provider = ref.watch(loadEmployeeRollStatisticsProvider);
 
     return provider.when(
       loading: () => const MyLoadingWidget(),
@@ -25,6 +25,7 @@ class PieChartWidget extends ConsumerWidget {
         return SfCircularChart(
           title: ChartTitle(text: 'Job Distribution'),
           palette: colors,
+          
           series: <CircularSeries>[
             PieSeries<ChartData, String>(
               dataSource: chartData,
@@ -34,8 +35,9 @@ class PieChartWidget extends ConsumerWidget {
                   '${data.x}: ${data.y.toInt()}',
               dataLabelSettings: const DataLabelSettings(
                 isVisible: true,
+                
                 labelPosition: ChartDataLabelPosition.outside,
-                overflowMode: OverflowMode.shift,
+                overflowMode: OverflowMode.trim,
               ),
               explode: true,
               explodeIndex: 0,

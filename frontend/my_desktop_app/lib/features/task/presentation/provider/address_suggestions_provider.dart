@@ -19,7 +19,7 @@ final addressSuggestionUseCaseProvider = Provider<AddressSuggestionUseCase>((ref
 //   return await repo.(input);
 // });
 
-final addressSuggestionsProvider = FutureProvider.family<List<AddressSuggestionEntities>, String>((ref, input) async {
+final addressSuggestionsProvider = FutureProvider.autoDispose.family<List<AddressSuggestionEntities>, String>((ref, input) async {
   final AddressSuggestionParams params = AddressSuggestionParams(address: input);
   final repo = ref.watch(addressSuggestionUseCaseProvider);
 

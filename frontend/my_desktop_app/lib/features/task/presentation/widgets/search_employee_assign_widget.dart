@@ -49,7 +49,7 @@ class _SearchEmployeeAssignWidgetState
 
     final message = state.error != null
         ? "Error: ${state.error}"
-        : "Employees assigned successfully.";
+        : "Task assigned successfully.";
     if (response){
       ref.invalidate(loadTaskDetailProvider);
     }
