@@ -23,14 +23,14 @@ The system ensures that employees cannot fake their location and provides admini
 ## 🏗️ Architecture  
 ```mermaid
 graph TD
-A[Flutter App (Mobile/Desktop)] -->|REST API| B[Node.js Backend]
-B --> C[MongoDB Database]
-B --> D[Facial Recognition Service]
-A --> E[GPS Location]
+    A[Flutter App (Mobile/Desktop)] -->|REST API| B[Node.js Backend]
+    B --> C[MongoDB Database]
+    B --> D[Facial Recognition Service]
+    A --> E[GPS Location]
 
 🚀 Installation & Setup
 1️⃣ Clone the Repository
-git clone https://github.com/your-username/employee-location-verification.git
+git clone https://github.com/SyedMuzamilShah/employeeLocationVerification
 cd employee-location-verification
 
 2️⃣ Backend Setup (Node.js)
