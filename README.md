@@ -20,13 +20,6 @@ The system ensures that employees cannot fake their location and provides admini
 
 ---
 
-## 🏗️ Architecture  
-```mermaid
-graph TD
-    A[Flutter App (Mobile/Desktop)] -->|REST API| B[Node.js Backend]
-    B --> C[MongoDB Database]
-    B --> D[Facial Recognition Service]
-    A --> E[GPS Location]
 
 ## 🚀 Installation & Setup  
 
