@@ -64,7 +64,7 @@ JWT_SECRET=your_secret_key
 <p align="center">
   <img src="app_images/mobile/task_detail.jpeg" alt="Task Detail" width="250"/>
   <img src="app_images/mobile/map_view.jpeg" alt="Map View" width="250"/>
-  <img src="app_images/mobile/out_of_task.jpeg.jpeg" alt="Map View" width="250"/>
+  <img src="app_images/mobile/out_of_task.jpeg" alt="Map View" width="250"/>
   <img src="app_images/mobile/setting.jpeg" alt="Settings" width="250"/>
   <img src="app_images/mobile/face_detection.jpeg" alt="Settings" width="250"/>
 </p>
