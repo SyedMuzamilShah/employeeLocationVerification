@@ -5,7 +5,6 @@ class AppConstants {
   static const String userKey = 'user_data';
   static const Duration apiTimeout = Duration(seconds: 30);
   static const String copyright = 
-  '© 2025 LocaFi – Employee Location Verification Using Facial Recognition\n'
-  'Developed by BSCS Students | Final Year Project – University of Balochistan\n'
-  'All rights reserved.';
+  '© 2025 LocaFi – All rights reserved.\n'
+  'Developed by Syed Muzamil Shah';
 }

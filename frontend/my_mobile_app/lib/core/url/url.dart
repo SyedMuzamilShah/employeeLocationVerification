@@ -2,6 +2,7 @@
 
 class ServerUrl {
   static const String _ip = '192.168.100.8';
+  // static const String _ip = '10.82.215.126';
 
   static String replaceLocalhost(String url) {
     return url.replaceFirst('localhost', _ip);

@@ -52,7 +52,7 @@ class _TaskAssignmentMapDialogState extends State<TaskAssignmentMapDialog> {
                     options: MapOptions(
                       initialCenter: widget.taskLocation,
                       // initialCenter: LatLng(30.195768, 67.017245),
-                      initialZoom: 14.0,
+                      initialZoom: 11.0,
                     ),
                     children: [
                       TileLayer(

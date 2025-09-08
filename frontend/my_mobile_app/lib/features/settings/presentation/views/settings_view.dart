@@ -67,13 +67,20 @@ class SettingsView extends ConsumerWidget {
               title: const Text('Logout'),
               onTap: () async {
                 showMyDialog(context, MyLoadingWidget(), isLoader: true);
-                await ref.read(basicAuthProvider.notifier).logout();
-                if (!context.mounted) return;
+                // try {
+                //   await ref.read(basicAuthProvider.notifier).logout();
+                //   // if (!context.mounted) return;
+
+                // } catch (e) {
+                //  print("$e"); 
+                // }
+                // if (!context.mounted) return;
                 Navigator.pop(context);
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (_) {
-                  return LoginView();
-                }));
+                // Navigator.pushReplacement(context,
+                //     MaterialPageRoute(builder: (_) {
+                //   return LoginView();
+                // }));
+                Navigator.pushReplacementNamed(context, AppRoutes.login);
                 // Handle logout
               },
             ),
