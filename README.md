@@ -27,7 +27,7 @@ The system ensures that employees cannot fake their location and provides admini
 ```bash
 git clone https://github.com/SyedMuzamilShah/employeeLocationVerification
 cd employee-location-verification
-
+```
 
 ### 2️⃣ Backend Setup (Node.js)  
 ```bash
@@ -41,10 +41,9 @@ npm run dev
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
+```
 
 ### 3️⃣ Frontend Setup (Flutter)
-```bash
-
 
 ## 📱 Screenshots  
 
