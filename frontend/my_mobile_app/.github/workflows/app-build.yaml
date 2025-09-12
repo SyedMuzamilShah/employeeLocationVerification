@@ -3,12 +3,20 @@ name: Flutter Android Build
 on:
   push:
     branches:
-      - main   # runs on push to main branch
+      - main   # Run workflow only when pushing to main
+    paths:
+      - 'frontend/my_mobile_app/**'   # Trigger only when mobile app files change
   pull_request:
+    paths:
+      - 'frontend/my_mobile_app/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend/my_mobile_app
 
     steps:
       # 1. Checkout repository
@@ -19,9 +27,9 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.1' # change to your Flutter version
+          flutter-version: '3.24.0' # change to your Flutter version
 
-      # 3. Get dependencies
+      # 3. Install dependencies
       - name: Install dependencies
         run: flutter pub get
 
@@ -37,15 +45,15 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
-      # 7. Build App Bundle (AAB for Play Store)
+      # 7. Build App Bundle (Play Store ready)
       - name: Build App Bundle
         run: flutter build appbundle --release
 
-      # 8. Upload build artifacts (for download in GitHub Actions UI)
+      # 8. Upload artifacts so you can download them from GitHub Actions UI
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: android-builds
           path: |
-            build/app/outputs/flutter-apk/app-release.apk
-            build/app/outputs/bundle/release/app-release.aab
+            frontend/my_mobile_app/build/app/outputs/flutter-apk/app-release.apk
+            frontend/my_mobile_app/build/app/outputs/bundle/release/app-release.aab
