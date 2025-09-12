@@ -1,0 +1,51 @@
+name: Flutter Android Build
+
+on:
+  push:
+    branches:
+      - main   # runs on push to main branch
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Setup Flutter
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.1' # change to your Flutter version
+
+      # 3. Get dependencies
+      - name: Install dependencies
+        run: flutter pub get
+
+      # 4. Analyze code
+      - name: Analyze project
+        run: flutter analyze
+
+      # 5. Run tests
+      - name: Run tests
+        run: flutter test
+
+      # 6. Build APK
+      - name: Build APK
+        run: flutter build apk --release
+
+      # 7. Build App Bundle (AAB for Play Store)
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+
+      # 8. Upload build artifacts (for download in GitHub Actions UI)
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-builds
+          path: |
+            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/bundle/release/app-release.aab
